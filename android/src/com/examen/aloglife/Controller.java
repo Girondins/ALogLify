@@ -25,13 +25,15 @@ public class Controller {
     private Double bmr;
     private String birthday;
     private String headerVal;
-    private int steps;
+    private int steps,calories;
+    private Double aee,hoursSinceMidnight;
 
 
     public Controller(Activity activity){
         this.activity = activity;
         setDate();
         setTime();
+        hoursMidnight();
     }
 
     public void setAuthCode(String authCode){
@@ -59,6 +61,8 @@ public class Controller {
         Intent i = new Intent(activity, AndroidLauncher.class);
         Bundle info = new Bundle();
         info.putInt("steps",steps);
+        info.putInt("calories",calories);
+        info.putDouble("bmr",bmr);
         info.putString("auth",authCode);
         info.putString("ref",refToken);
         info.putString("header",headerVal);
@@ -81,7 +85,7 @@ public class Controller {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         df.setTimeZone(TimeZone.getDefault());
         this.theTime = df.format(c.getTime());
-        Log.d("Time is ", " " + theTime);
+        Log.d("Time is ", " " + TimeZone.getDefault());
     }
 
     public String getDate(){
@@ -101,6 +105,7 @@ public class Controller {
         al.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                al.updateInfo(steps,calories);
                 al.refreshComplete();
             }
         });
@@ -117,7 +122,34 @@ public class Controller {
     }
 
     public void setSteps(int steps){
+        Log.d("SETTING STEPS", " " + steps);
         this.steps = steps;
+    }
+
+    public void setAee(Double aee){
+        this.aee = aee;
+        Log.d("AEE IS", aee + "");
+    }
+
+    public void hoursMidnight(){
+        Calendar c = Calendar.getInstance(); //now
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        long diff = (c.getTimeInMillis() - m.getTimeInMillis());
+        hoursSinceMidnight = 1 + ((double)diff / (double)(1000*60*60));
+        Log.d("HOURS SINCE MIDNIGHT ", hoursSinceMidnight + " ");
+    }
+
+    public void calcCalories(){
+        calories = (int) (aee + (bmr * hoursSinceMidnight));
+        Log.d("CALORIES BURNT  ", calories + "" );
+    }
+
+    public void setBmr(Double bmr){
+        this.bmr = bmr;
     }
 
 }

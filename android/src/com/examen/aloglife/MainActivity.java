@@ -1,22 +1,28 @@
 package com.examen.aloglife;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 /**
  * Created by Girondins on 2017-02-28.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends AndroidApplication {
     private WebView wb;
     private static final String CALLBACK_URL = "https://localhost";
     private final String CLIENT_ID ="daacd362-05d2-4d15-ab2c-ed07848469d4";
@@ -38,9 +44,28 @@ public class MainActivity extends Activity {
         wb = (WebView) findViewById(R.id.authWebID);
         wb.clearCache(true);
         cont = new Controller(this);
+        loading.setBackgroundColor(Color.TRANSPARENT);
+
+
+
+        final AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
+        cfg.r = cfg.g = cfg.b = cfg.a = 8;
+        View spine = initializeForView(new SimpleTestLog(),cfg);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        spine.setLayoutParams(params);
+        loading.addView(spine);
+
+
+        if (graphics.getView() instanceof SurfaceView) {
+            SurfaceView glView = (SurfaceView) graphics.getView();
+            glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+            glView.setZOrderOnTop(true);
+        }
+
+
         loading.setVisibility(View.GONE);
         loginPanel.setVisibility(View.GONE);
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

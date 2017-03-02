@@ -102,12 +102,12 @@ public class ApiConnector {
             // Set the timeout in milliseconds until a connection is established.
             // The default value is zero, that means the timeout is not used.
             int timeoutConnection = 2000;
-            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+          //  HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
             // Set the default socket timeout (SO_TIMEOUT)
             // in milliseconds which is the timeout for waiting for data.
             int timeoutSocket = 2000;
-            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-            DefaultHttpClient httpClient = new DefaultHttpClient(httpParameters);
+         //   HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpEntity httpEntity = null;
             HttpResponse httpResponse = null;
 
@@ -126,6 +126,7 @@ public class ApiConnector {
                 }
 
                 httpResponse = httpClient.execute(httpPost);
+
 
             } else if (method == GET) {
                 // appending params to url
@@ -236,6 +237,7 @@ public class ApiConnector {
 
     public void extractActivity(String activityInfo){
         int stepsCount = 0;
+        Double aeeCount = 0.00;
         String type;
         try {
             JSONArray extractResult = (JSONArray) ((JSONObject) JSONValue.parse(activityInfo)).get("result");
@@ -249,10 +251,16 @@ public class ApiConnector {
                         JSONObject details = (JSONObject) results.get("details");
                         Log.d("Details ", details.toString());
                         JSONArray steps = (JSONArray) details.get("steps");
+                        JSONArray aee = (JSONArray) details.get("aee");
                         for(int j = 0 ; j<steps.size(); j++){
                             stepsCount += (Long) steps.get(j);
                         }
+                        for(int y = 0; y<aee.size(); y++){
+                            aeeCount += (Double) aee.get(y);
+                        }
                         cont.setSteps(stepsCount);
+                        cont.setAee(aeeCount);
+                        cont.calcCalories();
                         break;
                 }
 

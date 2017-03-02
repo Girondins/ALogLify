@@ -19,7 +19,7 @@ import spine.SkeletonJson;
 import spine.SkeletonRenderer;
 import spine.SkeletonRendererDebug;
 
-public class SimpleTest1 extends ApplicationAdapter {
+public class SimpleTestLog extends ApplicationAdapter {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private SkeletonRenderer renderer;
@@ -38,27 +38,22 @@ public class SimpleTest1 extends ApplicationAdapter {
         debugRenderer.setBoundingBoxes(false);
         debugRenderer.setRegionAttachments(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("thelog/NewProject_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("thelog/NewProject_tex.json"));
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
         skeleton.setPosition(250, 20);
 
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-        stateData.setMix("run", "shoot", 0.2f);
-        stateData.setMix("shoot", "run", 0.2f);
 
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
         state.setTimeScale(0.5f); // Slow all animations down to 50% speed.
 
         // Queue animations on track 0.
-        state.setAnimation(0, "run", true);
-        state.addAnimation(0, "jump", false, 2); // Jump after 2 seconds.
-        state.addAnimation(0, "run", true, 0); // Run after the jump.
-        state.addAnimation(0, "shoot", true, 5);
-        state.addAnimation(0, "run", true, 0);
+        state.setAnimation(0, "animtion0", true);
+     //   state.addAnimation(0, "run", true, 0);
     }
 
     public void render () {
