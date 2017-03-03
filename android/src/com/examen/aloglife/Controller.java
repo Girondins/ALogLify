@@ -152,4 +152,13 @@ public class Controller {
         this.bmr = bmr;
     }
 
+    public void calculateCalorieIntake(){
+
+        int calorieApprox;
+     //   long age = ChronoUnit.YEARS.between(birthday, today);
+
+
+      //  calorieApprox=66.47+ (13.75 * weight) + (5.0 * height) - (6.75 x A)
+    }
+
 }

@@ -63,7 +63,6 @@ public class MainActivity extends AndroidApplication {
             glView.setZOrderOnTop(true);
         }
 
-
         loading.setVisibility(View.GONE);
         loginPanel.setVisibility(View.GONE);
         login.setOnClickListener(new View.OnClickListener() {

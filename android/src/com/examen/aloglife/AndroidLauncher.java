@@ -1,5 +1,7 @@
 package com.examen.aloglife;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -76,6 +78,7 @@ public class AndroidLauncher extends AndroidApplication {
 			public void onClick(View view) {
 				spineView.removeAllViews();
 				spineView.addView(initializeForView(new SimpleTestLog(),config));
+		//		launchApp("com.sonymobile.lifelog");
 			}
 		});
 	}
@@ -120,6 +123,20 @@ public class AndroidLauncher extends AndroidApplication {
 
 	public void refreshComplete(){
 		swipeContainer.setRefreshing(false);
+	}
+
+	protected void launchApp(String packageName) {
+		Intent mIntent = getPackageManager().getLaunchIntentForPackage(
+				packageName);
+		if (mIntent != null) {
+			try {
+				sendBroadcast(mIntent);
+			} catch (ActivityNotFoundException err) {
+				Toast t = Toast.makeText(getApplicationContext(),
+						"App not found", Toast.LENGTH_SHORT);
+				t.show();
+			}
+		}
 	}
 
 }

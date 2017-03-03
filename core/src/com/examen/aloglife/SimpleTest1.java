@@ -26,7 +26,7 @@ public class SimpleTest1 extends ApplicationAdapter {
     private SkeletonRendererDebug debugRenderer;
 
     private TextureAtlas atlas;
-    private Skeleton skeleton;
+    private Skeleton skeleton;    private Skeleton skeleton2;
     private AnimationState state;
 
     public void create () {
@@ -45,6 +45,8 @@ public class SimpleTest1 extends ApplicationAdapter {
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
         skeleton.setPosition(250, 20);
+        skeleton2 = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
+        skeleton2.setPosition(500, 20);
 
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
         stateData.setMix("run", "shoot", 0.2f);
@@ -66,8 +68,10 @@ public class SimpleTest1 extends ApplicationAdapter {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
-        skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+        state.apply(skeleton);
+        state.apply(skeleton2);// Poses skeleton using current animations. This sets the bones' local SRT.
+        skeleton.updateWorldTransform();
+        skeleton2.updateWorldTransform();// Uses the bones' local SRT to compute their world SRT.
 
         // Configure the camera, SpriteBatch, and SkeletonRendererDebug.
         camera.update();
@@ -75,7 +79,8 @@ public class SimpleTest1 extends ApplicationAdapter {
         debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
         batch.begin();
-        renderer.draw(batch, skeleton); // Draw the skeleton images.
+        renderer.draw(batch, skeleton);
+        renderer.draw(batch, skeleton2);// Draw the skeleton images.
         batch.end();
 
     //    debugRenderer.draw(skeleton); // Draw debug lines.
