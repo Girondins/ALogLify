@@ -135,11 +135,12 @@ idea {
 dependencies {
     compile project(path: ':volley-master')
     /**
-     compile files('C:/Users/Girondins/Desktop/Examen/ALogLify/libs/apache-httpcomponents-httpcore.jar')
-     compile files('C:/Users/Girondins/Desktop/Examen/ALogLify/libs/httpclient-4.0.3.jar')
-     compile files('C:/Users/Girondins/Desktop/Examen/ALogLify/libs/json-simple-1.1.jar')
+     compile files('/Users/Girondins/Desktop/ALogLify/libs/apache-httpcomponents-httpcore.jar')
+     compile files('/Users/Girondins/Desktop/ALogLify/libs/httpclient-4.0.3.jar')
+     compile files('/Users/Girondins/Desktop/ALogLify/libs/json-simple-1.1.jar')
      * */
-    compile files('/Users/Girondins/Desktop/ALogLify/libs/apache-httpcomponents-httpcore.jar')
-    compile files('/Users/Girondins/Desktop/ALogLify/libs/httpclient-4.0.3.jar')
-    compile files('/Users/Girondins/Desktop/ALogLify/libs/json-simple-1.1.jar')
+    compile files('C:/Users/Girondins/Desktop/Git Ex/ALogLify/libs/apache-httpcomponents-httpcore.jar')
+    compile files('C:/Users/Girondins/Desktop/Git Ex/ALogLify/libs/httpclient-4.0.3.jar')
+    compile files('C:/Users/Girondins/Desktop/Git Ex/ALogLify/libs/json-simple-1.1.jar')
+    compile files('C:/Users/Girondins/Desktop/Git Ex/ALogLify/libs/joda-time-2.4.jar')
 }

@@ -37,17 +37,17 @@ public class MainActivity extends AndroidApplication {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final RequestQueue queue = Volley.newRequestQueue(this);
-        loading = (RelativeLayout) findViewById(R.id.loadingPanel);
-        loginPanel = (RelativeLayout) findViewById(R.id.loginPanel);
-        login = (Button) findViewById(R.id.loginBtn);
-        wb = (WebView) findViewById(R.id.authWebID);
-        wb.clearCache(true);
-        cont = new Controller(this);
+        intiateComponents();
+        initateLoadingPanel();
+        settingVisibility();
+        settingOnClicks();
+        setupWebclient();
+        wb.loadUrl("https://platform.lifelog.sonymobile.com/oauth/2/authorize?client_id="+CLIENT_ID+ "&scope=lifelog.profile.read+lifelog.activities.read+lifelog.locations.read");
+
+    }
+
+    public void initateLoadingPanel(){
         loading.setBackgroundColor(Color.TRANSPARENT);
-
-
-
         final AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.r = cfg.g = cfg.b = cfg.a = 8;
         View spine = initializeForView(new SimpleTestLog(),cfg);
@@ -56,15 +56,29 @@ public class MainActivity extends AndroidApplication {
         spine.setLayoutParams(params);
         loading.addView(spine);
 
-
         if (graphics.getView() instanceof SurfaceView) {
             SurfaceView glView = (SurfaceView) graphics.getView();
             glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
             glView.setZOrderOnTop(true);
         }
+    }
 
-        loading.setVisibility(View.GONE);
+    public void intiateComponents(){
+        loading = (RelativeLayout) findViewById(R.id.loadingPanel);
+        loginPanel = (RelativeLayout) findViewById(R.id.loginPanel);
+        login = (Button) findViewById(R.id.loginBtn);
+        wb = (WebView) findViewById(R.id.authWebID);
+        wb.clearCache(true);
+        cont = new Controller(this);
+    }
+
+    public void settingVisibility(){
+        loading.setVisibility(View.VISIBLE);
         loginPanel.setVisibility(View.GONE);
+        wb.setVisibility(View.GONE);
+    }
+
+    public void settingOnClicks(){
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,17 +87,16 @@ public class MainActivity extends AndroidApplication {
                 onLogin = true;
             }
         });
+    }
 
-
-
-
-
+    public void setupWebclient(){
         wb.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if(url.contains("api")){
                     loginPanel.setVisibility(View.VISIBLE);
                     wb.setVisibility(View.GONE);
+                    loading.setVisibility(View.GONE);
                 }
 
                 if(url.contains("localhost")) {
@@ -102,9 +115,7 @@ public class MainActivity extends AndroidApplication {
                 return false; //Allow WebView to load url
             }
         });
-        wb.loadUrl("https://platform.lifelog.sonymobile.com/oauth/2/authorize?client_id="+CLIENT_ID+ "&scope=lifelog.profile.read+lifelog.activities.read+lifelog.locations.read");
     }
-
 
     @Override
     public void onBackPressed() {

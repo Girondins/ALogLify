@@ -21,76 +21,114 @@ public class AndroidLauncher extends AndroidApplication {
 	private Button stepsBtn,calBtn;
 	private int stepTotal,calories;
 	private int timer;
-	private Double bmr;
+	private Double bmr,weight,height;
 	private Controller cont;
-	private String authCode,refToken,header;
+	private String authCode,refToken,header,userName,birthday;
 	private SwipeRefreshLayout swipeContainer;
+	private AndroidApplicationConfiguration config;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_app);
+		extractInfo();
+		initiateComp();
+		setupController();
+		initiateSwipe();
+
+
+	}
+
+	public void initiateComp(){
 		spineView = (RelativeLayout) findViewById(R.id.spineViewID);
 		stepsBtn = (Button) findViewById(R.id.stepsBTN);
 		calBtn = (Button) findViewById(R.id.calBTN);
+		config = new AndroidApplicationConfiguration();
+		setTexts();
 
+	}
+
+	public void initiateSpineView(int toPlay){
+
+		switch(toPlay){
+			case 0:
+				spineView.addView(initializeForView(new SimpleTest1(),config));
+				break;
+			case 1:
+				spineView.addView(initializeForView(new SimpleTestLog(),config));
+		}
+
+	}
+
+	public void initiateSwipe(){
 		swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-		// Setup refresh listener which triggers new data loading
 		swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				// Your code to refresh the list here.
-				// Make sure you call swipeContainer.setRefreshing(false)
-				// once the network request has completed successfully.
-				 cont.updateInfo();
+				cont.updateInfo();
 			}
 		});
-		// Configure the refreshing colors
-		Log.d("Logging Loop", "Loooping");
 		swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
 				android.R.color.holo_green_light,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
 
+	}
 
-
-
-		extractInfo();
-
-		cont = new Controller(this);
-		cont.setupUpdate(authCode,refToken,header);
-		cont.setBmr(bmr);
-
-
-
-
+	public void setTexts(){
+		Log.d("Setting Texts", "Steps " + stepTotal);
 		stepsBtn.setText("Steps: " + stepTotal);
 		calBtn.setText("Cal Burnt: " + calories);
-		Log.d("STEEPY", " " + stepTotal);
+	}
 
-		final AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		spineView.addView(initializeForView(new SimpleTest1(),config));
-		//initialize(new SimpleTest1(), config);
-
-		calBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				spineView.removeAllViews();
-				spineView.addView(initializeForView(new SimpleTestLog(),config));
-		//		launchApp("com.sonymobile.lifelog");
-			}
-		});
+	public void setupController(){
+		cont = new Controller(this,userName,height,weight,bmr,birthday);
+		cont.setupUpdate(authCode,refToken,header);
+		cont.setSteps(stepTotal);
+		cont.setBurntCalories(calories);
+		cont.setBmr(bmr);
 	}
 
 	public void extractInfo(){
 		stepTotal = getIntent().getExtras().getInt("steps");
+		calories = getIntent().getExtras().getInt("calories");
 		authCode = getIntent().getExtras().getString("auth");
 		refToken = getIntent().getExtras().getString("ref");
 		header = getIntent().getExtras().getString("header");
-		calories = getIntent().getExtras().getInt("calories");
 		bmr = getIntent().getExtras().getDouble("bmr");
-		Log.d("Extract from intent", stepTotal + "  " + "/// " + header);
+		userName = getIntent().getExtras().getString("user");
+		birthday = getIntent().getExtras().getString("birthday");
+		height = getIntent().getExtras().getDouble("height");
+		weight = getIntent().getExtras().getDouble("weight");
+	//	Log.d("Extract from intent", stepTotal + "  " + "/// " + header);
+	}
+
+	public void updateInfo(int stepsTotal, int calories){
+		this.stepTotal = stepsTotal;
+		this.calories = calories;
+		stepsBtn.setText("Steps: " + stepsTotal);
+		calBtn.setText("Cal Burnt: " + calories);
+
+	}
+
+	public void refreshComplete(){
+		swipeContainer.setRefreshing(false);
+	}
+
+
+	protected void launchApp(String packageName) {
+		Intent mIntent = getPackageManager().getLaunchIntentForPackage(
+				packageName);
+		if (mIntent != null) {
+			try {
+				sendBroadcast(mIntent);
+			} catch (ActivityNotFoundException err) {
+				Toast t = Toast.makeText(getApplicationContext(),
+						"App not found", Toast.LENGTH_SHORT);
+				t.show();
+			}
+		}
 	}
 
 	@Override
@@ -113,30 +151,5 @@ public class AndroidLauncher extends AndroidApplication {
 
 	}
 
-	public void updateInfo(int stepsTotal, int calories){
-		this.stepTotal = stepsTotal;
-		this.calories = calories;
-		stepsBtn.setText("Steps: " + stepsTotal);
-		calBtn.setText("Cal Burnt: " + calories);
-
-	}
-
-	public void refreshComplete(){
-		swipeContainer.setRefreshing(false);
-	}
-
-	protected void launchApp(String packageName) {
-		Intent mIntent = getPackageManager().getLaunchIntentForPackage(
-				packageName);
-		if (mIntent != null) {
-			try {
-				sendBroadcast(mIntent);
-			} catch (ActivityNotFoundException err) {
-				Toast t = Toast.makeText(getApplicationContext(),
-						"App not found", Toast.LENGTH_SHORT);
-				t.show();
-			}
-		}
-	}
 
 }
