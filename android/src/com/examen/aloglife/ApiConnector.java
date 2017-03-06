@@ -83,7 +83,7 @@ public class ApiConnector {
      * @url - url to make request
      * @method - http request method
      */
-    public String makeServiceCall(String url, int method) {
+    private String makeServiceCall(String url, int method) {
         return this.makeServiceCall(url, method, null);
     }
 
@@ -94,7 +94,7 @@ public class ApiConnector {
      * @method - http request method
      * @params - http request params
      */
-    public String makeServiceCall(String url, int method,
+    private String makeServiceCall(String url, int method,
                                   List<NameValuePair> params) {
         try {
             // http client

@@ -19,7 +19,7 @@ import java.util.TimerTask;
 public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
 	private Button stepsBtn,calBtn;
-	private int stepTotal,calories;
+	private int stepsToday, caloriesToday;
 	private int timer;
 	private Double bmr,weight,height;
 	private Controller cont;
@@ -77,22 +77,22 @@ public class AndroidLauncher extends AndroidApplication {
 	}
 
 	public void setTexts(){
-		Log.d("Setting Texts", "Steps " + stepTotal);
-		stepsBtn.setText("Steps: " + stepTotal);
-		calBtn.setText("Cal Burnt: " + calories);
+		Log.d("Setting Texts", "Steps " + stepsToday);
+		stepsBtn.setText("Steps: " + stepsToday);
+		calBtn.setText("Cal Burnt: " + caloriesToday);
 	}
 
 	public void setupController(){
 		cont = new Controller(this,userName,height,weight,bmr,birthday);
 		cont.setupUpdate(authCode,refToken,header);
-		cont.setSteps(stepTotal);
-		cont.setBurntCalories(calories);
+		cont.setSteps(stepsToday);
+		cont.setBurntCalories(caloriesToday);
 		cont.setBmr(bmr);
 	}
 
 	public void extractInfo(){
-		stepTotal = getIntent().getExtras().getInt("steps");
-		calories = getIntent().getExtras().getInt("calories");
+		stepsToday = getIntent().getExtras().getInt("steps");
+		caloriesToday = getIntent().getExtras().getInt("caloriesToday");
 		authCode = getIntent().getExtras().getString("auth");
 		refToken = getIntent().getExtras().getString("ref");
 		header = getIntent().getExtras().getString("header");
@@ -101,12 +101,12 @@ public class AndroidLauncher extends AndroidApplication {
 		birthday = getIntent().getExtras().getString("birthday");
 		height = getIntent().getExtras().getDouble("height");
 		weight = getIntent().getExtras().getDouble("weight");
-	//	Log.d("Extract from intent", stepTotal + "  " + "/// " + header);
+	//	Log.d("Extract from intent", stepsToday + "  " + "/// " + header);
 	}
 
 	public void updateInfo(int stepsTotal, int calories){
-		this.stepTotal = stepsTotal;
-		this.calories = calories;
+		this.stepsToday = stepsTotal;
+		this.caloriesToday = calories;
 		stepsBtn.setText("Steps: " + stepsTotal);
 		calBtn.setText("Cal Burnt: " + calories);
 
@@ -149,6 +149,14 @@ public class AndroidLauncher extends AndroidApplication {
 		}
 
 
+	}
+
+	private class onCalorieClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+
+		}
 	}
 
 

@@ -37,16 +37,16 @@ public class MainActivity extends AndroidApplication {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        intiateComponents();
-        initateLoadingPanel();
+        initiateComponents();
+        initiateLoadingPanel();
         settingVisibility();
         settingOnClicks();
-        setupWebclient();
+        setupWebClient();
         wb.loadUrl("https://platform.lifelog.sonymobile.com/oauth/2/authorize?client_id="+CLIENT_ID+ "&scope=lifelog.profile.read+lifelog.activities.read+lifelog.locations.read");
 
     }
 
-    public void initateLoadingPanel(){
+    public void initiateLoadingPanel(){
         loading.setBackgroundColor(Color.TRANSPARENT);
         final AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.r = cfg.g = cfg.b = cfg.a = 8;
@@ -63,7 +63,7 @@ public class MainActivity extends AndroidApplication {
         }
     }
 
-    public void intiateComponents(){
+    public void initiateComponents(){
         loading = (RelativeLayout) findViewById(R.id.loadingPanel);
         loginPanel = (RelativeLayout) findViewById(R.id.loginPanel);
         login = (Button) findViewById(R.id.loginBtn);
@@ -89,7 +89,7 @@ public class MainActivity extends AndroidApplication {
         });
     }
 
-    public void setupWebclient(){
+    public void setupWebClient(){
         wb.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
