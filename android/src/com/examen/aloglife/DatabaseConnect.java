@@ -12,11 +12,13 @@ import android.util.Log;
  */
 
 public class DatabaseConnect extends SQLiteOpenHelper {
-    public static final String TABLE_CHAR ="char";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_BIRTH = "birth";
-    public static final String COLUMN_CALORIES = "calories";
-    public static final String COLUMN_STEPS = "steps";
+    private static final String TABLE_CHAR ="char";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_BIRTH = "birth";
+    private static final String COLUMN_CALORIES = "calories";
+    private static final String COLUMN_STEPS = "steps";
+    private static final String COLUMN_LASTLOGIN = "lastlog";
+    private static final String COLUMN_MIDNIGHTHOURS = "midnight";
 
 
 
@@ -25,6 +27,8 @@ public class DatabaseConnect extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_PERSON = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +
+            COLUMN_LASTLOGIN + " text , " +
+            COLUMN_MIDNIGHTHOURS + " double , " +
             COLUMN_CALORIES + " integer , " +
             COLUMN_STEPS + " integer);";
 
@@ -72,130 +76,49 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         return false;
     }
 
-/**
-    public void addWorker(String name,double wage, int monthhour){
+    public Character createCharacter(String username, String dayofbirth, Double midnightHours){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(UserDBHelper.COLUMN_NAME,name);
-        values.put(UserDBHelper.COLUMN_WAGE,wage);
-        values.put(UserDBHelper.COLUMN_CALCMONTH,monthhour);
-        db.insert(UserDBHelper.TABLE_PERSON,"",values);
-        Log.d("Adding Worker", name);
+        values.put(DatabaseConnect.COLUMN_ID,username);
+        values.put(DatabaseConnect.COLUMN_BIRTH,dayofbirth);
+        values.put(DatabaseConnect.COLUMN_MIDNIGHTHOURS,midnightHours);
+        db.insert(DatabaseConnect.TABLE_CHAR,"",values);
+        Log.d("Creating: ", username + "Born: " + dayofbirth);
+        return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth);
     }
 
-    public void removeWorker(String name){
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_PERSON,UserDBHelper.COLUMN_NAME + "= ?",new String[]{name});
-    }
-
-    public void editWorker(String name,double wage,int calcmonth){
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        if(wage != -1){
-            cv.put(UserDBHelper.COLUMN_WAGE,wage);
-        }
-        if(calcmonth != -1) {
-            cv.put(UserDBHelper.COLUMN_CALCMONTH, calcmonth);
-        }
-
-        db.update(UserDBHelper.TABLE_PERSON,cv,UserDBHelper.COLUMN_NAME + " = ?",new String []{name});
-
-
-    }
-
-    public void addNewHour(String name, int hours, String date){
-        SQLiteDatabase db = getWritableDatabase();
-        String statement = "INSERT INTO " + UserDBHelper.TABLE_HOURS + " VALUES ('" +
-                date + "'," + hours + "," +
-                "(SELECT " + UserDBHelper.COLUMN_NAME + " from " + UserDBHelper.TABLE_PERSON
-                + " WHERE " + UserDBHelper.COLUMN_NAME + " = '" + name + "'));";
-
-        db.execSQL(statement);
-
-
-    }
-
-    public void removeHour(String name, String date){
-        SQLiteDatabase db = getWritableDatabase();
-        String statement = "DELETE FROM " + UserDBHelper.TABLE_HOURS + " WHERE "
-                + UserDBHelper.COLUMN_WORKER + "='" + name + "' AND " +
-                UserDBHelper.COLUMN_DATE + "='" + date + "';";
-
-        db.execSQL(statement);
-
-
-    }
-
-    public void editHour(String name, String date, int hour){
-        SQLiteDatabase db = getWritableDatabase();
-
-        if(date != null) {
-            String statement = "UPDATE " + UserDBHelper.TABLE_HOURS + " SET " +
-                    UserDBHelper.COLUMN_DATE + "='" + date + "' WHERE " +
-                    UserDBHelper.COLUMN_WORKER + "=' " + name + "';";
-            db.execSQL(statement);
-        }
-        if(hour != -1){
-            String statement = "UPDATE " + UserDBHelper.TABLE_HOURS + " SET " +
-                    UserDBHelper.COLUMN_WORK + " ='" + hour + "' WHERE " +
-                    UserDBHelper.COLUMN_WORKER + "=' " + name + "';";
-            db.execSQL(statement);
-        }
-
-    }
-
-
-
-
-    public LinkedList<Person> getUsers(){
-        int wage,name,calcmonth;
-
-        inputs = new LinkedList<Person>();
+    public Character getCharacter(String username){
+        int cal,steps,birth,lastlogin,midnight;
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + UserDBHelper.TABLE_PERSON , null);
-
-        wage = cursor.getColumnIndex(UserDBHelper.COLUMN_WAGE);
-        name = cursor.getColumnIndex(UserDBHelper.COLUMN_NAME);
-        calcmonth = cursor.getColumnIndex(UserDBHelper.COLUMN_CALCMONTH);
-
-        Log.d("Rows", cursor.getCount() + "");
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "=" + username, null);
+        cal = cursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
+        birth = cursor.getColumnIndex(DatabaseConnect.COLUMN_BIRTH);
+        steps = cursor.getColumnIndex(DatabaseConnect.COLUMN_STEPS);
+        lastlogin = cursor.getColumnIndex(DatabaseConnect.COLUMN_LASTLOGIN);
+        midnight = cursor.getColumnIndex(DatabaseConnect.COLUMN_MIDNIGHTHOURS);
 
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Person current = new Person(cursor.getString(name),cursor.getDouble(wage),cursor.getInt(calcmonth));
-            inputs.add(getWorkersHours(current));
+            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getInt(midnight),cursor.getString(lastlogin));
+            return userCharacter;
         }
-
-
-
-
-        Log.d("Returning Users", inputs.size() + "");
-        return inputs;
-
+        return null;
     }
 
-    public Person getWorkersHours(Person person){
-        int work,date;
-
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + UserDBHelper.TABLE_HOURS +
-                " WHERE " + UserDBHelper.COLUMN_WORKER + "= ?",new String[]{person.getName()});
-
-
-        work = cursor.getColumnIndex(UserDBHelper.COLUMN_WORK);
-        date = cursor.getColumnIndex(UserDBHelper.COLUMN_DATE);
-
-
-        for(int i=0; i<cursor.getCount(); i++){
-            cursor.moveToPosition(i);
-            Log.d("HOURSDATE", cursor.getString(date) + " is " + person.getName() + " minutes " + cursor.getInt(work));
-            person.addHours(new Hours(cursor.getInt(work),cursor.getString(date)));
-        }
-
-        return person;
+    public void setLastLogin(String lastLogin, String username){
+        SQLiteDatabase db = getWritableDatabase();
+        String statement = "UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
+                DatabaseConnect.COLUMN_LASTLOGIN + "='" + lastLogin + "' WHERE " +
+                DatabaseConnect.COLUMN_ID + "=' " + username + "';";
+        db.execSQL(statement);
     }
 
 
-**/
+
+    public void eraseCharachter(String username){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(DatabaseConnect.TABLE_CHAR,DatabaseConnect.COLUMN_ID + "= ?",new String[]{username});
+    }
+
 
 }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
@@ -29,18 +31,21 @@ public class Controller {
     private Double bmr, calorieBurnDay, burnRateHour;
     private String birthday;
     private String headerVal;
-    private int steps,calories,accumulatedCals;
-    private int age,charAge;
-    private Double aee,hoursSinceMidnight;
+    private int steps,calories,totalCals,totalSteps;
+    private int age;
+    private Double aee,hoursSinceMidnight, toHaveBeenBurnt;
     private DatabaseConnect db;
     private AndroidLauncher al;
+    private Character userCharacter;
 
 
     public Controller(Activity activity){
         this.activity = activity;
         setDate();
+        setYesterday();
         setTime();
         hoursMidnight();
+        db = new DatabaseConnect(activity);
     }
 
     public Controller(Activity activity, String userName,Double height,Double weight, Double bmr, String birthday){
@@ -50,12 +55,13 @@ public class Controller {
         hoursMidnight();
         setPersonalInfo(userName,height,weight,bmr,birthday);
         db = new DatabaseConnect(activity);
-        retrieveStoredInfo();
+        initiateChar();
         al.initiateSpineView(1);
     }
 
 
     public void enterLifeLog(){
+        initiateChar();
         Intent i = new Intent(activity, AndroidLauncher.class);
         Bundle info = new Bundle();
         info.putInt("steps",steps);
@@ -79,7 +85,7 @@ public class Controller {
         api = new ApiConnector(authCode,refToken,headerVal,this, ApiConnector.FETCH.UPDATE);
         getAge();
         calculateCalorieIntake();
-        toHaveBurntCalToday();
+      //  toHaveBurntCalToday();
     }
 
     public void setDate(){
@@ -94,6 +100,7 @@ public class Controller {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         cal.add(Calendar.DATE, -1);
         yesterdayDate = dateFormat.format(cal.getTime());
+        Log.d("Yesteday was ", " " + yesterdayDate);
     }
 
     public void setTime(){
@@ -206,16 +213,74 @@ public class Controller {
         Log.d(" Burn: ", " "+ calorieBurnDay);
         Log.d(" To Burn/h: ", "" + burnRateHour);
     }
-
+    /**
     public void toHaveBurntCalToday(){
         accumulatedCals = (int) (hoursSinceMidnight * burnRateHour);
     }
-
-    public void calculateCharsAge(){
-
+**/
+    public void initiateChar(){
+        if(checkExistingChar()){
+            userCharacter = db.getCharacter(userName);
+        }else{
+            createCharacter();
+        }
+        db.setLastLogin(todaysDate,userName);
+        calculateCharsAge();
+        calculateTotalCals();
+        calculateTotalSteps();
     }
 
-    public void retrieveStoredInfo(){
+    public boolean checkExistingChar(){
+        return db.checkExistChar(userName);
+    }
+
+    public void createCharacter(){
+            userCharacter = db.createCharacter(userName,todaysDate,hoursSinceMidnight);
+    }
+
+    public void calculateCharsAge(){
+        String splitToday[] = todaysDate.split("-");
+        String splitBirth[] = userCharacter.getDayofbirth().split("-");
+        DateTime birth = new DateTime(Integer.parseInt(splitBirth[0]),Integer.parseInt(splitBirth[1]),Integer.parseInt(splitBirth[2]),0,0);
+        DateTime today = new DateTime(Integer.parseInt(splitToday[0]),Integer.parseInt(splitToday[1]),Integer.parseInt(splitToday[2]),0,0);
+        Days day = Days.daysBetween(birth,today);
+        userCharacter.setAge(day.getDays());
+        Log.d("Chars Age is: " , userCharacter.getAge() + " Days");
+    }
+
+    public void calculateTotalCals(){
+        totalCals = userCharacter.getTotalCal() + calories;
+    }
+
+    public void calculateTotalSteps(){
+        totalSteps = userCharacter.getTotalSteps() + steps;
+    }
+
+    public int getTotalCals(){
+        return this.totalCals;
+    }
+
+    public int getTotalSteps(){
+        return this.totalSteps;
+    }
+
+    public void setCalToBeBurnt(){
+        toHaveBeenBurnt = ((userCharacter.getAge()+1) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (userCharacter.getBirthFromMidnight() * burnRateHour);
+        Log.d("Calories To have Burnt:", " " + toHaveBeenBurnt);
+        Log.d("Calories you have burn:", " " + totalCals);
+    }
+    
+    //TODO Upload yesterday with call from LIFELOG API prev day
+    public void checkIfUpload(){
+        if(userCharacter.getAge()!=0){
+            if(!userCharacter.getLastLogin().equals(todaysDate)){
+                Log.d("Uploading data", " from: " + yesterdayDate);
+            }
+        }
+    }
+
+    //TODO Determine which Spine animation to load on start and update
+    public void setSpineToLoad(){
 
     }
 
