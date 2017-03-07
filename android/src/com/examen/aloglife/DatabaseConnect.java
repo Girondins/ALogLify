@@ -23,8 +23,8 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "aloglife.db";
-    private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_CREATE_PERSON = "CREATE TABLE " + TABLE_CHAR + "(" +
+    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_CREATE_CHAR = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +
             COLUMN_LASTLOGIN + " text , " +
@@ -42,7 +42,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE_PERSON);
+        db.execSQL(DATABASE_CREATE_CHAR);
 
     }
 
@@ -56,7 +56,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(DatabaseConnect.class.getName(),"Updating database from version" + oldVersion + "to"
                 + newVersion + ", which will replace all old data");
-        db.execSQL("DROP TABLE IF EXISTS" + TABLE_CHAR);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAR);
         onCreate(db);
 
     }
@@ -83,14 +83,14 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         values.put(DatabaseConnect.COLUMN_BIRTH,dayofbirth);
         values.put(DatabaseConnect.COLUMN_MIDNIGHTHOURS,midnightHours);
         db.insert(DatabaseConnect.TABLE_CHAR,"",values);
-        Log.d("Creating: ", username + "Born: " + dayofbirth);
+        Log.d("Creating: ", username + " Born: " + dayofbirth + " Midnight: " + midnightHours);
         return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth);
     }
 
     public Character getCharacter(String username){
         int cal,steps,birth,lastlogin,midnight;
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "=" + username, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "= ?" , new String[]{username});
         cal = cursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
         birth = cursor.getColumnIndex(DatabaseConnect.COLUMN_BIRTH);
         steps = cursor.getColumnIndex(DatabaseConnect.COLUMN_STEPS);
@@ -100,17 +100,58 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
             Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getInt(midnight),cursor.getString(lastlogin));
+            Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getUsername() + " Midnight: " + userCharacter.getLastLogin());
             return userCharacter;
         }
         return null;
     }
 
     public void setLastLogin(String lastLogin, String username){
+        Log.d("Setting Last LogIn: " , lastLogin);
+
         SQLiteDatabase db = getWritableDatabase();
         String statement = "UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
                 DatabaseConnect.COLUMN_LASTLOGIN + "='" + lastLogin + "' WHERE " +
                 DatabaseConnect.COLUMN_ID + "=' " + username + "';";
-        db.execSQL(statement);
+
+        Cursor c = db.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
+                        DatabaseConnect.COLUMN_LASTLOGIN + "=?" + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{lastLogin,username});
+
+        c.moveToFirst();
+        c.close();
+      //  db.execSQL(statement);
+    }
+
+    public void uploadToDatabase(String username,int yCals, int ySteps){
+        int cal,steps,upCals,upSteps
+                ,dbCals=0,dbSteps=0;
+
+        SQLiteDatabase readDb = getReadableDatabase();
+        SQLiteDatabase writeDb = getWritableDatabase();
+        Cursor readCursor = readDb.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "= ?",new String[]{username});
+        cal = readCursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
+        steps = readCursor.getColumnIndex(DatabaseConnect.COLUMN_STEPS);
+
+        for(int i=0; i<readCursor.getCount(); i++){
+            readCursor.moveToPosition(i);
+            dbCals = readCursor.getInt(cal);
+            dbSteps = readCursor.getInt(steps);
+        }
+
+        upCals = dbCals + yCals;
+        upSteps = dbSteps + ySteps;
+
+        Cursor stepCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
+                DatabaseConnect.COLUMN_CALORIES + "=" + upSteps + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
+
+        Cursor calCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
+                DatabaseConnect.COLUMN_STEPS + "=" + upCals + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
+
+        stepCurs.moveToFirst();
+        calCurs.moveToFirst();
+        stepCurs.close();
+        calCurs.close();
+
     }
 
 

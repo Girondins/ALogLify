@@ -16,6 +16,8 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.examen.aloglife.Controller.SPINEVIEW.NORMAL;
+
 public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
 	private Button stepsBtn,calBtn;
@@ -26,6 +28,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private String authCode,refToken,header,userName,birthday;
 	private SwipeRefreshLayout swipeContainer;
 	private AndroidApplicationConfiguration config;
+	private Controller.SPINEVIEW selectedView;
 
 
 	@Override
@@ -36,6 +39,7 @@ public class AndroidLauncher extends AndroidApplication {
 		initiateComp();
 		setupController();
 		initiateSwipe();
+		initiateSpineView(selectedView);
 
 
 	}
@@ -44,19 +48,23 @@ public class AndroidLauncher extends AndroidApplication {
 		spineView = (RelativeLayout) findViewById(R.id.spineViewID);
 		stepsBtn = (Button) findViewById(R.id.stepsBTN);
 		calBtn = (Button) findViewById(R.id.calBTN);
+		stepsBtn.setOnClickListener(new OnStepsClick());
+		calBtn.setOnClickListener(new OnCalorieClick());
 		config = new AndroidApplicationConfiguration();
 		setTexts();
 
 	}
 
-	public void initiateSpineView(int toPlay){
+	public void initiateSpineView(Controller.SPINEVIEW toPlay){
+		spineView.removeAllViews();
 
 		switch(toPlay){
-			case 0:
+			case NORMAL:
 				spineView.addView(initializeForView(new SimpleTest1(),config));
 				break;
-			case 1:
+			case FAT:
 				spineView.addView(initializeForView(new SimpleTestLog(),config));
+				break;
 		}
 
 	}
@@ -88,11 +96,13 @@ public class AndroidLauncher extends AndroidApplication {
 		cont.setSteps(stepsToday);
 		cont.setBurntCalories(caloriesToday);
 		cont.setBmr(bmr);
+		cont.initiateChar();
 	}
 
 	public void extractInfo(){
+		selectedView = (Controller.SPINEVIEW) getIntent().getSerializableExtra("view");
 		stepsToday = getIntent().getExtras().getInt("steps");
-		caloriesToday = getIntent().getExtras().getInt("caloriesToday");
+		caloriesToday = getIntent().getExtras().getInt("calories");
 		authCode = getIntent().getExtras().getString("auth");
 		refToken = getIntent().getExtras().getString("ref");
 		header = getIntent().getExtras().getString("header");
@@ -101,6 +111,7 @@ public class AndroidLauncher extends AndroidApplication {
 		birthday = getIntent().getExtras().getString("birthday");
 		height = getIntent().getExtras().getDouble("height");
 		weight = getIntent().getExtras().getDouble("weight");
+		Log.d(" IS THIS NULL?!" , caloriesToday + "");
 	//	Log.d("Extract from intent", stepsToday + "  " + "/// " + header);
 	}
 
@@ -151,11 +162,21 @@ public class AndroidLauncher extends AndroidApplication {
 
 	}
 
-	private class onCalorieClick implements View.OnClickListener{
+	//TODO CREATE REVERSE WHEN CLICKED
+
+	private class OnStepsClick implements View.OnClickListener{
 
 		@Override
 		public void onClick(View view) {
+			stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
+		}
+	}
 
+	private class OnCalorieClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+			calBtn.setText("Total Cals: " + cont.getTotalCals());
 		}
 	}
 

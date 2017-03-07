@@ -39,6 +39,13 @@ public class Controller {
     private Character userCharacter;
 
 
+    public static enum SPINEVIEW{
+        IDLE,FAT,FIT,NORMAL
+    }
+
+    private SPINEVIEW selectedView;
+
+
     public Controller(Activity activity){
         this.activity = activity;
         setDate();
@@ -50,13 +57,19 @@ public class Controller {
 
     public Controller(Activity activity, String userName,Double height,Double weight, Double bmr, String birthday){
         al = (AndroidLauncher) activity;
+        db = new DatabaseConnect(activity);
+        this.userName = userName;
+        this.height = height;
+        this.weight = weight;
+        this.bmr = bmr;
+        this.birthday = birthday;
+        getCharacter();
         setDate();
         setTime();
         hoursMidnight();
-        setPersonalInfo(userName,height,weight,bmr,birthday);
-        db = new DatabaseConnect(activity);
-        initiateChar();
-        al.initiateSpineView(1);
+        getCharacter();
+     //   setPersonalInfo(userName,height,weight,bmr,birthday);
+      //  al.initiateSpineView(1);
     }
 
 
@@ -74,7 +87,8 @@ public class Controller {
         info.putString("auth",authCode);
         info.putString("ref",refToken);
         info.putString("header",headerVal);
-        Log.d("Renew", refToken);
+        info.putSerializable("view",selectedView);
+        Log.d("Renew", calories + "");
         i.putExtras(info);
         activity.startActivity(i);
         activity.finish();
@@ -84,7 +98,6 @@ public class Controller {
         Log.d(" AUTHCODE    /", headerVal);
         api = new ApiConnector(authCode,refToken,headerVal,this, ApiConnector.FETCH.UPDATE);
         getAge();
-        calculateCalorieIntake();
       //  toHaveBurntCalToday();
     }
 
@@ -97,7 +110,7 @@ public class Controller {
 
     public void setYesterday(){
         Calendar cal = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         cal.add(Calendar.DATE, -1);
         yesterdayDate = dateFormat.format(cal.getTime());
         Log.d("Yesteday was ", " " + yesterdayDate);
@@ -150,12 +163,16 @@ public class Controller {
         this.weight = weight;
         this.bmr = bmr;
         this.birthday = birthday;
+        getCharacter();
+        checkIfUpload();
+
     }
 
     public void refreshComplete(){
         al.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                al.initiateSpineView(SPINEVIEW.FAT);
                 al.updateInfo(steps,calories);
                 al.refreshComplete();
             }
@@ -188,6 +205,10 @@ public class Controller {
         return this.todaysDate;
     }
 
+    public String getYesterday(){
+        return this.yesterdayDate;
+    }
+
     public void getAge(){
         int year,month,day;
         String[] split = birthday.split("-");
@@ -218,16 +239,23 @@ public class Controller {
         accumulatedCals = (int) (hoursSinceMidnight * burnRateHour);
     }
 **/
-    public void initiateChar(){
+    public void getCharacter(){
+        calculateCalorieIntake();
         if(checkExistingChar()){
             userCharacter = db.getCharacter(userName);
         }else{
             createCharacter();
         }
+    }
+
+
+    public void initiateChar(){
         db.setLastLogin(todaysDate,userName);
         calculateCharsAge();
         calculateTotalCals();
         calculateTotalSteps();
+        setCalToBeBurnt();
+        setSpineToLoad();
     }
 
     public boolean checkExistingChar(){
@@ -236,6 +264,7 @@ public class Controller {
 
     public void createCharacter(){
             userCharacter = db.createCharacter(userName,todaysDate,hoursSinceMidnight);
+            Log.d("Recieved Charac: ", "\nSteps: " + userCharacter.getTotalSteps() + "\nCals: " + userCharacter.getTotalCal());
     }
 
     public void calculateCharsAge(){
@@ -249,10 +278,12 @@ public class Controller {
     }
 
     public void calculateTotalCals(){
+        Log.d("Total Cals: ", userCharacter.getTotalCal() + " and " + calories);
         totalCals = userCharacter.getTotalCal() + calories;
     }
 
     public void calculateTotalSteps(){
+        Log.d("Total Steps: ", userCharacter.getTotalSteps() + " and " + steps);
         totalSteps = userCharacter.getTotalSteps() + steps;
     }
 
@@ -265,23 +296,35 @@ public class Controller {
     }
 
     public void setCalToBeBurnt(){
-        toHaveBeenBurnt = ((userCharacter.getAge()+1) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (userCharacter.getBirthFromMidnight() * burnRateHour);
+        Log.d("What is NULL?", " AGE? " + userCharacter.getAge() + " CALSBURN?" + calorieBurnDay + " HSM? " + hoursSinceMidnight + "brH?" + burnRateHour+ "BFM? " + userCharacter.getBirthFromMidnight());
+        toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (userCharacter.getBirthFromMidnight() * burnRateHour);
         Log.d("Calories To have Burnt:", " " + toHaveBeenBurnt);
         Log.d("Calories you have burn:", " " + totalCals);
     }
-    
-    //TODO Upload yesterday with call from LIFELOG API prev day
+
     public void checkIfUpload(){
-        if(userCharacter.getAge()!=0){
-            if(!userCharacter.getLastLogin().equals(todaysDate)){
-                Log.d("Uploading data", " from: " + yesterdayDate);
-            }
+        if(userCharacter.getAge()!=0 && !userCharacter.getLastLogin().equals(todaysDate)) {
+            Log.d("Uploading data", " from: " + yesterdayDate);
+            api.getYesterdayActivties();
+        }else{
+            api.renewToken();
         }
+
+    }
+
+    public void uploadYesterday(int ySteps, double yAee){
+        int yCals = (int) (yAee + (bmr * 24));
+        Log.d("Uploading: " , yCals + " and " + ySteps);
+        db.uploadToDatabase(userName,yCals,ySteps);
+     //   api.setWait(false);
+
+
     }
 
     //TODO Determine which Spine animation to load on start and update
+    // Determined by total calories burnt factor
     public void setSpineToLoad(){
-
+        selectedView = SPINEVIEW.NORMAL;
     }
 
 }

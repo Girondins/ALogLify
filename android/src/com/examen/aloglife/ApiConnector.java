@@ -13,7 +13,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
@@ -22,12 +21,9 @@ import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Girondins on 30/01/17.
@@ -44,11 +40,14 @@ public class ApiConnector {
     private String refreshToken;
     private Long refresh_expires;
     private String headerValue;
-    private boolean hasHeader = false;
+    private volatile boolean hasHeader = false;
     private Controller cont;
+    private volatile boolean isForUpdate = true;
+    private volatile boolean waitForCheck = true;
     private final String CLIENT_ID ="daacd362-05d2-4d15-ab2c-ed07848469d4";
     private final String CLIENT_SECRET="PEHQvGvZ7ml0qP9sgKoXiDw_Vqw";
     private String authCode;
+
     private FETCH fetch;
     public static enum FETCH{
         UPDATE,LOGIN
@@ -201,9 +200,20 @@ public class ApiConnector {
             headerValue = "Bearer " + accessToken;
             hasHeader = true;
             cont.setRefreshToken(refreshToken);
-            if(fetch == FETCH.LOGIN) {
+         /**   if(fetch == FETCH.LOGIN && isForUpdate == true) {
                 getToday();
             }
+          **/
+            if(isForUpdate == true){
+                getToday();
+            }
+
+            if(isForUpdate == false){
+                isForUpdate = true;
+                renewToken();
+                Log.d("GET TODAY", "IS FALSE");
+            }
+            Log.d(" For Update is" , isForUpdate + "");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -239,6 +249,8 @@ public class ApiConnector {
         int stepsCount = 0;
         Double aeeCount = 0.00;
         String type;
+
+
         try {
             JSONArray extractResult = (JSONArray) ((JSONObject) JSONValue.parse(activityInfo)).get("result");
             Log.d("TESTING ACTIVITY ",extractResult.size() + "");
@@ -277,16 +289,55 @@ public class ApiConnector {
 
         if(this.fetch == FETCH.UPDATE){
             cont.refreshComplete();
-            renewToken();
+           // renewToken();
+            Log.d("WTF STUCK AGAIN", "NOOO");
         }
+    }
+
+    public void extractYesterday(String yesterdayInfo){
+        int stepsCount = 0;
+        Double aeeCount = 0.00;
+        String type;
+        try {
+            JSONArray extractResult = (JSONArray) ((JSONObject) JSONValue.parse(yesterdayInfo)).get("result");
+            Log.d("TESTING ACTIVITY ",extractResult.size() + "");
+            for(int i = 0; i<extractResult.size(); i++) {
+                JSONObject results = (JSONObject) extractResult.get(i);
+                type = (String) results.get("type");
+
+                switch (type){
+                    case "physical":
+                        JSONObject details = (JSONObject) results.get("details");
+                        Log.d("Details ", details.toString());
+                        JSONArray steps = (JSONArray) details.get("steps");
+                        JSONArray aee = (JSONArray) details.get("aee");
+                        for(int j = 0 ; j<steps.size(); j++){
+                            stepsCount += (Long) steps.get(j);
+                        }
+                        for(int y = 0; y<aee.size(); y++){
+                            aeeCount += (Double) aee.get(y);
+                        }
+                        break;
+                }
+
+
+            }
+
+            cont.uploadYesterday(stepsCount,aeeCount);
+       //     getToday();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void authorize(String accessCode){
         thread.execute(new Authenticate());
     }
 
-    public void getActivites(){
-        thread.execute(new GetActivites());
+    public void getYesterdayActivties(){
+        thread.execute(new GetYesterdayActivties());
     }
 
     public void getPersonal()
@@ -299,9 +350,16 @@ public class ApiConnector {
     }
 
     public void renewToken(){
-        thread.execute(new RenewToken());
+        Log.d(" RENEW UPDATE", isForUpdate + "");
+        if(isForUpdate == false){
+            Thread t = new Thread(new RenewToken());
+            t.start();
+            Log.d(" RENEW UPDATE", isForUpdate + "");
+        }else {
+            thread.execute(new RenewToken());
+            Log.d(" FAAALSE", isForUpdate + "");
+        }
     }
-
 
 
     private class Authenticate implements Runnable {
@@ -332,7 +390,7 @@ public class ApiConnector {
 
             Log.d("RE REFF", refreshToken + " HEADER  " + headerValue + " is Ture" + hasHeader);
             String res = makeServiceCall("https://platform.lifelog.sonymobile.com/oauth/2/refresh_token",2,nameValuePairs);
-            Log.d("RefreshToken Success",res);
+            Log.d("RefreshToken Success" + isForUpdate,res);
             extractRenew(res);
         }
     }
@@ -343,18 +401,35 @@ public class ApiConnector {
         public void run() {
             String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/",1);
             Log.d("Me", res);
-            renewToken();
             extractPersonal(res);
             //  renewToken();
         }
     }
 
-    private class GetActivites implements Runnable {
+    private class GetYesterdayActivties implements Runnable {
+        private String yesterday,today;
+
+        public GetYesterdayActivties(){
+            this.yesterday = cont.getYesterday();
+            this.today = cont.getDate();
+        }
 
         @Override
         public void run() {
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities",1);
+            isForUpdate = false;
+            renewToken();
+            while(isForUpdate == false){
+                try {
+                    Thread.sleep(500);
+                    Log.d("STUCK", "HELP");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T00:00:01.000Z&end_time="+ this.today +"T00:00:01.000Z",1);
             Log.d("Act", res);
+            Log.d("EXtract Yesteday", " JEPP");
+            extractYesterday(res);
           //  renewToken();
         }
     }
