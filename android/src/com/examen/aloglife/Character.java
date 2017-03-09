@@ -7,9 +7,9 @@ package com.examen.aloglife;
 public class Character {
     private String username,dayofbirth,lastLogin;
     private int totalSteps,totalCal,age;
-    private double birthFromMidnight;
+    private long birthFromMidnight;
 
-    public Character(String username,String dayofbirth, int totalCal, int totalSteps, double birthFromMidnight, String lastLogin){
+    public Character(String username,String dayofbirth, int totalCal, int totalSteps, long birthFromMidnight, String lastLogin){
         this.username = username;
         this.dayofbirth = dayofbirth;
         this.totalCal = totalCal;
@@ -30,7 +30,7 @@ public class Character {
         return this.age;
     }
 
-    public double getBirthFromMidnight() {
+    public long getBirthFromMidnight() {
         return birthFromMidnight;
     }
 

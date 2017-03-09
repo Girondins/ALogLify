@@ -23,12 +23,12 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "aloglife.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_CREATE_CHAR = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +
             COLUMN_LASTLOGIN + " text , " +
-            COLUMN_MIDNIGHTHOURS + " double , " +
+            COLUMN_MIDNIGHTHOURS + " long , " +
             COLUMN_CALORIES + " integer , " +
             COLUMN_STEPS + " integer);";
 
@@ -76,7 +76,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         return false;
     }
 
-    public Character createCharacter(String username, String dayofbirth, Double midnightHours){
+    public Character createCharacter(String username, String dayofbirth, long midnightHours){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConnect.COLUMN_ID,username);
@@ -99,7 +99,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getInt(midnight),cursor.getString(lastlogin));
+            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getLong(midnight),cursor.getString(lastlogin));
             Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getDayofbirth() + " Midnight: " + userCharacter.getLastLogin());
             return userCharacter;
         }
@@ -110,9 +110,6 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         Log.d("Setting Last LogIn: " , lastLogin);
 
         SQLiteDatabase db = getWritableDatabase();
-        String statement = "UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
-                DatabaseConnect.COLUMN_LASTLOGIN + "='" + lastLogin + "' WHERE " +
-                DatabaseConnect.COLUMN_ID + "=' " + username + "';";
 
         Cursor c = db.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
                         DatabaseConnect.COLUMN_LASTLOGIN + "=?" + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{lastLogin,username});
@@ -138,7 +135,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
             dbSteps = readCursor.getInt(steps);
         }
 
-        Log.d("DB Steps: ", dbCals + "" );
+        Log.d("DB Steps: ", dbSteps + "" );
 
         upCals = dbCals + yCals;
         upSteps = dbSteps + ySteps;

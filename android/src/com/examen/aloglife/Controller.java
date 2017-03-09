@@ -33,10 +33,12 @@ public class Controller {
     private String headerVal;
     private int steps,calories,totalCals,totalSteps;
     private int age;
+    private long milisecondsMidnight;
     private Double aee,hoursSinceMidnight, toHaveBeenBurnt;
     private DatabaseConnect db;
     private AndroidLauncher al;
     private Character userCharacter;
+    private volatile boolean isFirst = false;
 
 
     public static enum SPINEVIEW{
@@ -182,25 +184,47 @@ public class Controller {
 
     public void updateInfo(){
        // api.renewToken();
-        api.forRefresh();
+        if(userCharacter.getAge() == 0){
+            isFirst = true;
+            api.isFirstDay(true);
+            api.forRefresh();
+        }else{
+            isFirst = false;
+            api.isFirstDay(false);
+            api.forRefresh();
+        }
         Log.d("Uppp", "Op");
     }
 
     public void calcCalories(){
+        if(isFirst == true){
+            Calendar m = Calendar.getInstance(); //midnight
+            m.set(Calendar.HOUR_OF_DAY, 0);
+            m.set(Calendar.MINUTE, 0);
+            m.set(Calendar.SECOND, 0);
+            m.set(Calendar.MILLISECOND, 0);
+            long diff = (userCharacter.getBirthFromMidnight() - m.getTimeInMillis());
+            double fromMidnight = 1 + ((double)diff / (double)(1000*60*60));
+            calories = (int) (aee + (bmr* (24-fromMidnight)));
+            Log.d("Calcing First", calories + " Time: " + (24-fromMidnight));
+        }else
         calories = (int) (aee + (bmr * hoursSinceMidnight));
         Log.d("CALORIES BURNT  ", calories + "" );
     }
 
     public void hoursMidnight(){
         Calendar c = Calendar.getInstance(); //now
+        milisecondsMidnight = c.getTimeInMillis();
+
         Calendar m = Calendar.getInstance(); //midnight
         m.set(Calendar.HOUR_OF_DAY, 0);
         m.set(Calendar.MINUTE, 0);
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         long diff = (c.getTimeInMillis() - m.getTimeInMillis());
+        Log.d(" Differnece", diff + "");
         hoursSinceMidnight = 1 + ((double)diff / (double)(1000*60*60));
-        Log.d("HOURS SINCE MIDNIGHT ", hoursSinceMidnight + " ");
+        Log.d("HOURS SINCE MIDNIGHT " + hoursSinceMidnight, " " + " TOTAL  MIN : " + milisecondsMidnight + " MILIS : " + c.getTimeInMillis());
     }
 
     public String getDate(){
@@ -245,7 +269,7 @@ public class Controller {
         calculateCalorieIntake();
         if(checkExistingChar()){
             userCharacter = db.getCharacter(userName);
-            Log.d("Characther exists", userCharacter.getTotalCal() + " steps: " + userCharacter.getTotalCal());
+            Log.d("Characther exists", userCharacter.getTotalCal() + " steps: " + userCharacter.getTotalCal() + " MILI " + milisecondsMidnight);
         }else{
             createCharacter();
         }
@@ -266,7 +290,8 @@ public class Controller {
     }
 
     public void createCharacter(){
-            userCharacter = db.createCharacter(userName,todaysDate,hoursSinceMidnight);
+            Log.d(" MILI  ", milisecondsMidnight + "");
+            userCharacter = db.createCharacter(userName,todaysDate,milisecondsMidnight);
             Log.d("Recieved Charac: ", "\nSteps: " + userCharacter.getTotalSteps() + "\nCals: " + userCharacter.getTotalCal());
     }
 
@@ -306,21 +331,51 @@ public class Controller {
         return this.totalSteps;
     }
 
+
+    //TODO FIXA KLOCKA SEN FÖDSEL
     public void setCalToBeBurnt(){
+        Calendar c = Calendar.getInstance();
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
         Log.d("What is NULL?", " AGE? " + userCharacter.getAge() + " CALSBURN?" + calorieBurnDay + " HSM? " + hoursSinceMidnight + "brH?" + burnRateHour+ "BFM? " + userCharacter.getBirthFromMidnight());
-        toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (userCharacter.getBirthFromMidnight() * burnRateHour);
+        long diff = (userCharacter.getBirthFromMidnight() - m.getTimeInMillis());
+        double fromMidnight = 1 + ((double)diff / (double)(1000*60*60));
+        Log.d("Check Midnight", "Mid: " + hoursSinceMidnight + " Night: " + fromMidnight );
+        if(isFirst == true){
+            double first = 1 + ((double)c.getTimeInMillis() / (double)(1000*60*60));
+            toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (first*burnRateHour);
+            Log.d(" CREATION ", first + "");
+        }else {
+            toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (fromMidnight * burnRateHour);
+        }
         Log.d("Calories To have Burnt:", " " + toHaveBeenBurnt);
         Log.d("Calories you have burn:", " " + totalCals);
     }
 
-    //TODO FIXA UPLOAD IF AGE = 1 ATT ENDAST UPLOAD FRÅN HOURS FROM MIDNIGHT NEGATIVE
     public void checkIfUpload(){
+
         Log.d("Checking Upload: ", "Age: " + userCharacter.getAge() + " LastLogin: " + userCharacter.getLastLogin() + " Today Is: " + todaysDate );
+
         if(userCharacter.getAge()!=0 && !userCharacter.getLastLogin().equals(todaysDate)) {
             Log.d("Uploading data", " from: " + yesterdayDate);
+            if(userCharacter.getAge() == 1){
+                api.getSpecYesterday();
+            }else
             api.getYesterdayActivties();
         }else{
-            api.renewToken();
+            if(userCharacter.getAge() == 0) {
+                isFirst = true;
+                api.isFirstDay(true);
+                api.renewToken();
+                Log.d("Is First Day" , "WOOO");
+            }else {
+                isFirst = false;
+                api.isFirstDay(false);
+                api.renewToken();
+            }
         }
 
     }
@@ -332,6 +387,18 @@ public class Controller {
      //   api.setWait(false);
 
 
+    }
+
+    public String firstTimer(){
+        int minutes = (int) ((userCharacter.getBirthFromMidnight())/60000);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, minutes/60);
+        cal.set(Calendar.MINUTE, minutes % 60);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        Log.d(" Check Upload First ", sdf.format(cal.getTime()));
+        return sdf.format(cal.getTime());
     }
 
     //TODO Determine which Spine animation to load on start and update

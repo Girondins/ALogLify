@@ -43,7 +43,7 @@ public class ApiConnector {
     private volatile boolean hasHeader = false;
     private Controller cont;
     private volatile boolean isForUpload = true;
-    private volatile boolean waitForCheck = true;
+    private volatile boolean isFirstDay = false;
     private volatile boolean isRefresh = false;
     private final String CLIENT_ID ="daacd362-05d2-4d15-ab2c-ed07848469d4";
     private final String CLIENT_SECRET="PEHQvGvZ7ml0qP9sgKoXiDw_Vqw";
@@ -205,7 +205,11 @@ public class ApiConnector {
                 getToday();
             }
           **/
-            if(isForUpload == true){
+            if(isFirstDay == true){
+                getFirstToday();
+            }
+
+            if(isForUpload == true && isFirstDay == false){
                 getToday();
             }
 
@@ -329,7 +333,7 @@ public class ApiConnector {
 
 
             }
-
+            Log.d(" API YESTER", stepsCount + "");
             cont.uploadYesterday(stepsCount,aeeCount);
        //     getToday();
 
@@ -347,6 +351,10 @@ public class ApiConnector {
         thread.execute(new GetYesterdayActivties());
     }
 
+    public void getSpecYesterday(){
+        thread.execute(new GetSpecificYesterday());
+    }
+
     public void getPersonal()
     {
         thread.execute(new GetPersonalInfo());
@@ -354,6 +362,10 @@ public class ApiConnector {
 
     public void getToday(){
         thread.execute(new GetTodaysActivites());
+    }
+
+    public void getFirstToday(){
+        thread.execute(new GetFirstDayActivites());
     }
 
     public void renewToken(){
@@ -370,7 +382,14 @@ public class ApiConnector {
 
     public void forRefresh(){
         isRefresh = true;
+        if(isFirstDay = true){
+            getFirstToday();
+        }else
         getToday();
+    }
+
+    public void isFirstDay(boolean isit){
+        isFirstDay = isit;
     }
 
 
@@ -446,6 +465,35 @@ public class ApiConnector {
         }
     }
 
+    private class GetSpecificYesterday implements Runnable{
+        private String yesterday,today,startTime;
+
+        public GetSpecificYesterday(){
+            this.yesterday = cont.getYesterday();
+            this.today = cont.getDate();
+            this.startTime = cont.firstTimer();
+        }
+
+        @Override
+        public void run() {
+            isForUpload = false;
+            renewToken();
+            while(isForUpload == false){
+                try {
+                    Thread.sleep(500);
+                    Log.d("STUCK", "HELP");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000Z",1);
+            Log.d("Act", res);
+            Log.d("EXtract Yesteday", " JEPP");
+            extractYesterday(res);
+            //  renewToken();
+        }
+    }
+
     private class GetTodaysActivites implements Runnable {
         private String today;
 
@@ -459,6 +507,21 @@ public class ApiConnector {
             Log.d("Today" , res);
             extractActivity(res);
           //  renewToken();
+        }
+    }
+
+    private class GetFirstDayActivites implements Runnable {
+        private String today,startTime;
+
+        public GetFirstDayActivites(){
+            today = cont.getDate();
+            startTime = cont.firstTimer();
+        }
+        @Override
+        public void run() {
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.today +"T"+ this.startTime +":01.000Z",1);
+            Log.d("Today First" , res);
+            extractActivity(res);
         }
     }
 
