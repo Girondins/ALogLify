@@ -1,0 +1,41 @@
+
+LoggiBoy_tex.png
+size: 0,0
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+LEG
+  rotate: false
+  xy: 557 ,297
+  size: 212 ,299
+  orig: 300 ,300
+  offset: -44 ,0
+  index: -1
+body
+  rotate: false
+  xy: 1 ,297
+  size: 272 ,296
+  orig: 300 ,300
+  offset: -13 ,-2
+  index: -1
+ARM_R
+  rotate: false
+  xy: 275 ,297
+  size: 280 ,266
+  orig: 300 ,300
+  offset: 0 ,-13
+  index: -1
+ARM_L
+  rotate: false
+  xy: 1 ,1
+  size: 280 ,294
+  orig: 300 ,300
+  offset: -20 ,-3
+  index: -1
+eye
+  rotate: false
+  xy: 1 ,595
+  size: 272 ,274
+  orig: 300 ,300
+  offset: -14 ,-13
+  index: -1

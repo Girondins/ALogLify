@@ -2,9 +2,15 @@ package com.examen.aloglife;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.Display;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -20,7 +26,7 @@ import static com.examen.aloglife.Controller.SPINEVIEW.NORMAL;
 
 public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
-	private Button stepsBtn,calBtn;
+	private Button stepsBtn,calBtn,ageBtn;
 	private int stepsToday, caloriesToday;
 	private int timer;
 	private Double bmr,weight,height;
@@ -29,30 +35,51 @@ public class AndroidLauncher extends AndroidApplication {
 	private SwipeRefreshLayout swipeContainer;
 	private AndroidApplicationConfiguration config;
 	private Controller.SPINEVIEW selectedView;
+	private boolean ageIs = false,stepsIs = false,calIs = false;
+	private float centerX,centerY,screenH,screenW;
+	private AndroidApplicationConfiguration cfg;
 
 
+	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_app);
 		extractInfo();
-		initiateComp();
 		setupController();
+		initiateComp();
 		initiateSwipe();
 		initiateSpineView(selectedView);
 
 
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
 	public void initiateComp(){
 		spineView = (RelativeLayout) findViewById(R.id.spineViewID);
 		stepsBtn = (Button) findViewById(R.id.stepsBTN);
 		calBtn = (Button) findViewById(R.id.calBTN);
+		ageBtn = (Button) findViewById(R.id.ageBTN);
 		stepsBtn.setOnClickListener(new OnStepsClick());
 		calBtn.setOnClickListener(new OnCalorieClick());
-		config = new AndroidApplicationConfiguration();
+		ageBtn.setOnClickListener(new OnAgeClick());
+		cfg = new AndroidApplicationConfiguration();
+		cfg.r = cfg.g = cfg.b = cfg.a = 8;
+
+		getCenter();
 		setTexts();
 
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
+	public void getCenter(){
+		Display display = getWindowManager().getDefaultDisplay();
+		final Point size = new Point();
+		display.getSize(size);
+		screenH = size.y;
+		screenW = size.x;
+		centerY=screenH/2;
+		centerX=screenW/2;
 	}
 
 	public void initiateSpineView(Controller.SPINEVIEW toPlay){
@@ -60,10 +87,16 @@ public class AndroidLauncher extends AndroidApplication {
 
 		switch(toPlay){
 			case NORMAL:
-				spineView.addView(initializeForView(new SimpleTest1(),config));
+				Boggi idle = new Boggi(centerX,centerY);
+				spineView.addView(initializeForView(idle,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
 				break;
 			case FAT:
-				spineView.addView(initializeForView(new SimpleTestLog(),config));
+				spineView.addView(initializeForView(new SimpleTestLog(),cfg));
 				break;
 		}
 
@@ -74,6 +107,7 @@ public class AndroidLauncher extends AndroidApplication {
 		swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
+				Log.d("Refresh status before: " , stepsIs + "" + calIs + ageIs + "");
 				cont.updateInfo();
 			}
 		});
@@ -88,6 +122,7 @@ public class AndroidLauncher extends AndroidApplication {
 		Log.d("Setting Texts", "Steps " + stepsToday);
 		stepsBtn.setText("Steps: " + stepsToday);
 		calBtn.setText("Cal Burnt: " + caloriesToday);
+		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 	}
 
 	public void setupController(){
@@ -118,15 +153,29 @@ public class AndroidLauncher extends AndroidApplication {
 	public void updateInfo(int stepsTotal, int calories){
 		this.stepsToday = stepsTotal;
 		this.caloriesToday = calories;
-		stepsBtn.setText("Steps: " + stepsTotal);
-		calBtn.setText("Cal Burnt: " + calories);
 
+		Log.d("Refresh status is: " , stepsIs + "" + calIs + ageIs + "");
+
+		if(stepsIs){
+			stepsBtn.setText("Steps: " + stepsToday);
+		}else {
+			stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
+		}
+		if(calIs) {
+			calBtn.setText("Cal Burnt: " + calories);
+		}else {
+			calBtn.setText("Total Cals: " + cont.getTotalCals());
+		}
+		if(ageIs) {
+			ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
+		}else {
+			ageBtn.setText("Born: " + cont.getCharacterBirth());
+		}
 	}
 
 	public void refreshComplete(){
 		swipeContainer.setRefreshing(false);
 	}
-
 
 	protected void launchApp(String packageName) {
 		Intent mIntent = getPackageManager().getLaunchIntentForPackage(
@@ -168,7 +217,13 @@ public class AndroidLauncher extends AndroidApplication {
 
 		@Override
 		public void onClick(View view) {
-			stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
+			if(stepsIs){
+				stepsBtn.setText("Steps: " + stepsToday);
+				stepsIs = false;
+			}else{
+				stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
+				stepsIs = true;
+			}
 		}
 	}
 
@@ -176,9 +231,28 @@ public class AndroidLauncher extends AndroidApplication {
 
 		@Override
 		public void onClick(View view) {
-			calBtn.setText("Total Cals: " + cont.getTotalCals());
+			if(calIs){
+				calBtn.setText("Cal Burnt: " + caloriesToday);
+				calIs = false;
+			}else{
+				calBtn.setText("Total Cals: " + cont.getTotalCals());
+				calIs = true;
+			}
 		}
 	}
 
+	private class OnAgeClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+			if(ageIs){
+				ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
+				ageIs = false;
+			}else{
+				ageBtn.setText("Born: " + cont.getCharacterBirth());
+				ageIs = true;
+			}
+		}
+	}
 
 }

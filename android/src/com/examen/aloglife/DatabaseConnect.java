@@ -100,7 +100,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
             Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getInt(midnight),cursor.getString(lastlogin));
-            Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getUsername() + " Midnight: " + userCharacter.getLastLogin());
+            Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getDayofbirth() + " Midnight: " + userCharacter.getLastLogin());
             return userCharacter;
         }
         return null;
@@ -138,14 +138,18 @@ public class DatabaseConnect extends SQLiteOpenHelper {
             dbSteps = readCursor.getInt(steps);
         }
 
+        Log.d("DB Steps: ", dbCals + "" );
+
         upCals = dbCals + yCals;
         upSteps = dbSteps + ySteps;
 
+        Log.d("TOTAL STEPS FROM DB: ", upSteps + "");
+
         Cursor stepCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
-                DatabaseConnect.COLUMN_CALORIES + "=" + upSteps + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
+                DatabaseConnect.COLUMN_STEPS + "=" + upSteps + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
 
         Cursor calCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
-                DatabaseConnect.COLUMN_STEPS + "=" + upCals + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
+                DatabaseConnect.COLUMN_CALORIES + "=" + upCals + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
 
         stepCurs.moveToFirst();
         calCurs.moveToFirst();

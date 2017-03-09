@@ -42,8 +42,9 @@ public class ApiConnector {
     private String headerValue;
     private volatile boolean hasHeader = false;
     private Controller cont;
-    private volatile boolean isForUpdate = true;
+    private volatile boolean isForUpload = true;
     private volatile boolean waitForCheck = true;
+    private volatile boolean isRefresh = false;
     private final String CLIENT_ID ="daacd362-05d2-4d15-ab2c-ed07848469d4";
     private final String CLIENT_SECRET="PEHQvGvZ7ml0qP9sgKoXiDw_Vqw";
     private String authCode;
@@ -200,20 +201,20 @@ public class ApiConnector {
             headerValue = "Bearer " + accessToken;
             hasHeader = true;
             cont.setRefreshToken(refreshToken);
-         /**   if(fetch == FETCH.LOGIN && isForUpdate == true) {
+         /**   if(fetch == FETCH.LOGIN && isForUpload == true) {
                 getToday();
             }
           **/
-            if(isForUpdate == true){
+            if(isForUpload == true){
                 getToday();
             }
 
-            if(isForUpdate == false){
-                isForUpdate = true;
+            if(isForUpload == false){
+                isForUpload = true;
                 renewToken();
                 Log.d("GET TODAY", "IS FALSE");
             }
-            Log.d(" For Update is" , isForUpdate + "");
+            Log.d(" For Update is" , isForUpload + "");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,6 +283,12 @@ public class ApiConnector {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if(this.isRefresh == true){
+            renewToken();
+            isRefresh = false;
+        }
+
         Log.d("StepsTotal", stepsCount + "");
         if(this.fetch == FETCH.LOGIN){
             cont.enterLifeLog();
@@ -350,15 +357,20 @@ public class ApiConnector {
     }
 
     public void renewToken(){
-        Log.d(" RENEW UPDATE", isForUpdate + "");
-        if(isForUpdate == false){
+        Log.d(" RENEW UPDATE", isForUpload + "");
+        if(isForUpload == false){
             Thread t = new Thread(new RenewToken());
             t.start();
-            Log.d(" RENEW UPDATE", isForUpdate + "");
+            Log.d(" RENEW UPDATE", isForUpload + "");
         }else {
             thread.execute(new RenewToken());
-            Log.d(" FAAALSE", isForUpdate + "");
+            Log.d(" FAAALSE", isForUpload + "");
         }
+    }
+
+    public void forRefresh(){
+        isRefresh = true;
+        getToday();
     }
 
 
@@ -390,7 +402,7 @@ public class ApiConnector {
 
             Log.d("RE REFF", refreshToken + " HEADER  " + headerValue + " is Ture" + hasHeader);
             String res = makeServiceCall("https://platform.lifelog.sonymobile.com/oauth/2/refresh_token",2,nameValuePairs);
-            Log.d("RefreshToken Success" + isForUpdate,res);
+            Log.d("RefreshToken Success" + isForUpload,res);
             extractRenew(res);
         }
     }
@@ -416,9 +428,9 @@ public class ApiConnector {
 
         @Override
         public void run() {
-            isForUpdate = false;
+            isForUpload = false;
             renewToken();
-            while(isForUpdate == false){
+            while(isForUpload == false){
                 try {
                     Thread.sleep(500);
                     Log.d("STUCK", "HELP");

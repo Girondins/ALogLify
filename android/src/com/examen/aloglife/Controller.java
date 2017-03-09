@@ -63,11 +63,10 @@ public class Controller {
         this.weight = weight;
         this.bmr = bmr;
         this.birthday = birthday;
-        getCharacter();
         setDate();
         setTime();
-        hoursMidnight();
         getCharacter();
+        hoursMidnight();
      //   setPersonalInfo(userName,height,weight,bmr,birthday);
       //  al.initiateSpineView(1);
     }
@@ -172,7 +171,9 @@ public class Controller {
         al.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                al.initiateSpineView(SPINEVIEW.FAT);
+        //        calculateCharsAge();
+        //        calculateTotalSteps();
+                al.initiateSpineView(SPINEVIEW.NORMAL);
                 al.updateInfo(steps,calories);
                 al.refreshComplete();
             }
@@ -180,7 +181,8 @@ public class Controller {
     }
 
     public void updateInfo(){
-        api.getToday();
+       // api.renewToken();
+        api.forRefresh();
         Log.d("Uppp", "Op");
     }
 
@@ -243,15 +245,16 @@ public class Controller {
         calculateCalorieIntake();
         if(checkExistingChar()){
             userCharacter = db.getCharacter(userName);
+            Log.d("Characther exists", userCharacter.getTotalCal() + " steps: " + userCharacter.getTotalCal());
         }else{
             createCharacter();
         }
+        calculateCharsAge();
     }
 
 
     public void initiateChar(){
         db.setLastLogin(todaysDate,userName);
-        calculateCharsAge();
         calculateTotalCals();
         calculateTotalSteps();
         setCalToBeBurnt();
@@ -287,6 +290,14 @@ public class Controller {
         totalSteps = userCharacter.getTotalSteps() + steps;
     }
 
+    public int getCharacterAge(){
+        return this.userCharacter.getAge();
+    }
+
+    public String getCharacterBirth(){
+        return this.userCharacter.getDayofbirth();
+    }
+
     public int getTotalCals(){
         return this.totalCals;
     }
@@ -302,7 +313,9 @@ public class Controller {
         Log.d("Calories you have burn:", " " + totalCals);
     }
 
+    //TODO FIXA UPLOAD IF AGE = 1 ATT ENDAST UPLOAD FRÅN HOURS FROM MIDNIGHT NEGATIVE
     public void checkIfUpload(){
+        Log.d("Checking Upload: ", "Age: " + userCharacter.getAge() + " LastLogin: " + userCharacter.getLastLogin() + " Today Is: " + todaysDate );
         if(userCharacter.getAge()!=0 && !userCharacter.getLastLogin().equals(todaysDate)) {
             Log.d("Uploading data", " from: " + yesterdayDate);
             api.getYesterdayActivties();

@@ -1,17 +1,24 @@
 package com.examen.aloglife;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.Display;
 import android.view.SurfaceView;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.android.volley.RequestQueue;
@@ -29,10 +36,13 @@ public class MainActivity extends AndroidApplication {
     private Controller cont;
     private RelativeLayout loading;
     private Button login;
-    private RelativeLayout loginPanel;
+    private RelativeLayout loginPanel,mainBack;
     private boolean onLogin = false;
+    private float centerX,centerY;
+    private View spine;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +56,24 @@ public class MainActivity extends AndroidApplication {
 
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void initiateLoadingPanel(){
+        float height,width;
         loading.setBackgroundColor(Color.TRANSPARENT);
         final AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
         cfg.r = cfg.g = cfg.b = cfg.a = 8;
-        View spine = initializeForView(new SimpleTestLog(),cfg);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        final Point size = new Point();
+        display.getSize(size);
+        height = size.y;
+        width = size.x;
+        centerY=height/2;
+        centerX=width/2;
+
+        Loggi spineToLoad = new Loggi(centerX,centerY);
+        Log.d("Creating Loggi", " True");
+        spine = initializeForView(spineToLoad,cfg);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         spine.setLayoutParams(params);
@@ -63,11 +86,15 @@ public class MainActivity extends AndroidApplication {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     public void initiateComponents(){
+        mainBack = (RelativeLayout) findViewById(R.id.mainBack);
         loading = (RelativeLayout) findViewById(R.id.loadingPanel);
         loginPanel = (RelativeLayout) findViewById(R.id.loginPanel);
         login = (Button) findViewById(R.id.loginBtn);
         wb = (WebView) findViewById(R.id.authWebID);
+        login.setX(centerX);
+        mainBack.setBackgroundColor(Color.parseColor("#5066af"));
         wb.clearCache(true);
         cont = new Controller(this);
     }
@@ -84,6 +111,7 @@ public class MainActivity extends AndroidApplication {
             public void onClick(View view) {
                 wb.setVisibility(View.VISIBLE);
                 loginPanel.setVisibility(View.GONE);
+                spine.setVisibility(View.GONE);
                 onLogin = true;
             }
         });
@@ -101,6 +129,7 @@ public class MainActivity extends AndroidApplication {
 
                 if(url.contains("localhost")) {
                     wb.setVisibility(View.GONE);
+                    spine.setVisibility(View.VISIBLE);
                     loading.setVisibility(View.VISIBLE);
                     Log.d("code",url);
                     Uri uri =  Uri.parse( url );;
@@ -121,11 +150,13 @@ public class MainActivity extends AndroidApplication {
     public void onBackPressed() {
         if(onLogin == true){
             loginPanel.setVisibility(View.VISIBLE);
+            spine.setVisibility(View.VISIBLE);
             wb.setVisibility(View.GONE);
             onLogin = false;
             wb.loadUrl("https://platform.lifelog.sonymobile.com/oauth/2/authorize?client_id="+CLIENT_ID+ "&scope=lifelog.profile.read+lifelog.activities.read+lifelog.locations.read");
-        }else
+        }else {
             super.onBackPressed();
+        }
     }
 
 }
