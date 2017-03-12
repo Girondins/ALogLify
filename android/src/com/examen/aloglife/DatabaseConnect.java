@@ -19,15 +19,17 @@ public class DatabaseConnect extends SQLiteOpenHelper {
     private static final String COLUMN_STEPS = "steps";
     private static final String COLUMN_LASTLOGIN = "lastlog";
     private static final String COLUMN_MIDNIGHTHOURS = "midnight";
+    private static final String COLUMN_TIMEZONE = "timezone";
 
 
 
     private static final String DATABASE_NAME = "aloglife.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 16;
     private static final String DATABASE_CREATE_CHAR = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +
             COLUMN_LASTLOGIN + " text , " +
+            COLUMN_TIMEZONE + " text , " +
             COLUMN_MIDNIGHTHOURS + " long , " +
             COLUMN_CALORIES + " integer , " +
             COLUMN_STEPS + " integer);";
@@ -76,19 +78,20 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         return false;
     }
 
-    public Character createCharacter(String username, String dayofbirth, long midnightHours){
+    public Character createCharacter(String username, String dayofbirth, long midnightHours, String timezone){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConnect.COLUMN_ID,username);
         values.put(DatabaseConnect.COLUMN_BIRTH,dayofbirth);
         values.put(DatabaseConnect.COLUMN_MIDNIGHTHOURS,midnightHours);
+        values.put(DatabaseConnect.COLUMN_TIMEZONE,timezone);
         db.insert(DatabaseConnect.TABLE_CHAR,"",values);
         Log.d("Creating: ", username + " Born: " + dayofbirth + " Midnight: " + midnightHours);
-        return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth);
+        return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth,timezone);
     }
 
     public Character getCharacter(String username){
-        int cal,steps,birth,lastlogin,midnight;
+        int cal,steps,birth,lastlogin,midnight,timezone;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "= ?" , new String[]{username});
         cal = cursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
@@ -96,11 +99,12 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         steps = cursor.getColumnIndex(DatabaseConnect.COLUMN_STEPS);
         lastlogin = cursor.getColumnIndex(DatabaseConnect.COLUMN_LASTLOGIN);
         midnight = cursor.getColumnIndex(DatabaseConnect.COLUMN_MIDNIGHTHOURS);
+        timezone = cursor.getColumnIndex(DatabaseConnect.COLUMN_TIMEZONE);
 
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getLong(midnight),cursor.getString(lastlogin));
-            Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getDayofbirth() + " Midnight: " + userCharacter.getLastLogin());
+            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getLong(midnight),cursor.getString(lastlogin),cursor.getString(timezone));
+            Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getDayofbirth() + " Midnight: " + userCharacter.getBirthFromMidnight() + " STEPS:  " + userCharacter.getTotalSteps() + "TIME ZONE: " + userCharacter.getBirthTimeZone());
             return userCharacter;
         }
         return null;

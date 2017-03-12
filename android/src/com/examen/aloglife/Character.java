@@ -5,17 +5,18 @@ package com.examen.aloglife;
  */
 
 public class Character {
-    private String username,dayofbirth,lastLogin;
+    private String username,dayofbirth,lastLogin,birthTimeZone;
     private int totalSteps,totalCal,age;
     private long birthFromMidnight;
 
-    public Character(String username,String dayofbirth, int totalCal, int totalSteps, long birthFromMidnight, String lastLogin){
+    public Character(String username,String dayofbirth, int totalCal, int totalSteps, long birthFromMidnight, String lastLogin,String birthTimeZone){
         this.username = username;
         this.dayofbirth = dayofbirth;
         this.totalCal = totalCal;
         this.totalSteps = totalSteps;
         this.birthFromMidnight = birthFromMidnight;
         this.lastLogin = lastLogin;
+        this.birthTimeZone = birthTimeZone;
     }
 
     public void setAge(int age){
@@ -28,6 +29,10 @@ public class Character {
 
     public int getAge(){
         return this.age;
+    }
+
+    public String getBirthTimeZone(){
+        return this.birthTimeZone;
     }
 
     public long getBirthFromMidnight() {

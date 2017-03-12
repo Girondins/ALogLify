@@ -209,8 +209,9 @@ public class ApiConnector {
                 getFirstToday();
             }
 
-            if(isForUpload == true && isFirstDay == false){
+            if(isForUpload == true && isFirstDay == false && isRefresh == false){
                 getToday();
+                Log.d("IS FOR UPLOAD", isForUpload + "");
             }
 
             if(isForUpload == false){
@@ -218,6 +219,11 @@ public class ApiConnector {
                 renewToken();
                 Log.d("GET TODAY", "IS FALSE");
             }
+
+            if(isRefresh == true){
+                isRefresh = false;
+            }
+
             Log.d(" For Update is" , isForUpload + "");
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,7 +296,7 @@ public class ApiConnector {
 
         if(this.isRefresh == true){
             renewToken();
-            isRefresh = false;
+         //   isRefresh = false;
         }
 
         Log.d("StepsTotal", stepsCount + "");
@@ -382,7 +388,7 @@ public class ApiConnector {
 
     public void forRefresh(){
         isRefresh = true;
-        if(isFirstDay = true){
+        if(isFirstDay == true){
             getFirstToday();
         }else
         getToday();
@@ -438,11 +444,12 @@ public class ApiConnector {
     }
 
     private class GetYesterdayActivties implements Runnable {
-        private String yesterday,today;
+        private String yesterday,today,timeZone;
 
         public GetYesterdayActivties(){
             this.yesterday = cont.getYesterday();
             this.today = cont.getDate();
+            this.timeZone = cont.getTimeZone();
         }
 
         @Override
@@ -457,7 +464,7 @@ public class ApiConnector {
                     e.printStackTrace();
                 }
             }
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T00:00:01.000Z&end_time="+ this.today +"T00:00:01.000Z",1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T00:00:01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
             Log.d("Act", res);
             Log.d("EXtract Yesteday", " JEPP");
             extractYesterday(res);
@@ -466,12 +473,13 @@ public class ApiConnector {
     }
 
     private class GetSpecificYesterday implements Runnable{
-        private String yesterday,today,startTime;
+        private String yesterday,today,startTime,timeZone;
 
         public GetSpecificYesterday(){
             this.yesterday = cont.getYesterday();
             this.today = cont.getDate();
             this.startTime = cont.firstTimer();
+            this.timeZone = cont.getTimeZone();
         }
 
         @Override
@@ -486,7 +494,7 @@ public class ApiConnector {
                     e.printStackTrace();
                 }
             }
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000Z",1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
             Log.d("Act", res);
             Log.d("EXtract Yesteday", " JEPP");
             extractYesterday(res);
@@ -495,15 +503,16 @@ public class ApiConnector {
     }
 
     private class GetTodaysActivites implements Runnable {
-        private String today;
+        private String today,timezone;
 
         public GetTodaysActivites(){
             today = cont.getDate();
+            timezone = cont.getTimeZone();
         }
 
         @Override
         public void run() {
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.today +"T00:00:01.000Z",1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.today +"T00:00:01.000" + timezone,1);
             Log.d("Today" , res);
             extractActivity(res);
           //  renewToken();
@@ -511,15 +520,16 @@ public class ApiConnector {
     }
 
     private class GetFirstDayActivites implements Runnable {
-        private String today,startTime;
+        private String today,startTime,timeZone;
 
         public GetFirstDayActivites(){
             today = cont.getDate();
             startTime = cont.firstTimer();
+            timeZone = cont.getTimeZone();
         }
         @Override
         public void run() {
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.today +"T"+ this.startTime +":01.000Z",1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.today +"T"+ this.startTime +":01.000" + timeZone,1);
             Log.d("Today First" , res);
             extractActivity(res);
         }

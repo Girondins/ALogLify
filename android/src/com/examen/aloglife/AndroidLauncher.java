@@ -119,9 +119,9 @@ public class AndroidLauncher extends AndroidApplication {
 	}
 
 	public void setTexts(){
-		Log.d("Setting Texts", "Steps " + stepsToday);
-		stepsBtn.setText("Steps: " + stepsToday);
-		calBtn.setText("Cal Burnt: " + caloriesToday);
+		Log.d("Setting Texts", "Steps " + cont.getTodaySteps());
+		stepsBtn.setText("Steps: " + cont.getTodaySteps());
+		calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 	}
 
@@ -156,21 +156,22 @@ public class AndroidLauncher extends AndroidApplication {
 
 		Log.d("Refresh status is: " , stepsIs + "" + calIs + ageIs + "");
 
-		if(stepsIs){
+		if(stepsIs == false){
 			stepsBtn.setText("Steps: " + stepsToday);
 		}else {
 			stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
 		}
-		if(calIs) {
+		if(calIs == false) {
 			calBtn.setText("Cal Burnt: " + calories);
 		}else {
 			calBtn.setText("Total Cals: " + cont.getTotalCals());
 		}
-		if(ageIs) {
+		if(ageIs == false) {
 			ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 		}else {
 			ageBtn.setText("Born: " + cont.getCharacterBirth());
 		}
+
 	}
 
 	public void refreshComplete(){
@@ -218,7 +219,7 @@ public class AndroidLauncher extends AndroidApplication {
 		@Override
 		public void onClick(View view) {
 			if(stepsIs){
-				stepsBtn.setText("Steps: " + stepsToday);
+				stepsBtn.setText("Steps: " + cont.getTodaySteps());
 				stepsIs = false;
 			}else{
 				stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
@@ -232,7 +233,7 @@ public class AndroidLauncher extends AndroidApplication {
 		@Override
 		public void onClick(View view) {
 			if(calIs){
-				calBtn.setText("Cal Burnt: " + caloriesToday);
+				calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 				calIs = false;
 			}else{
 				calBtn.setText("Total Cals: " + cont.getTotalCals());

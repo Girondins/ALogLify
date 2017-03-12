@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
@@ -31,6 +33,7 @@ public class Controller {
     private Double bmr, calorieBurnDay, burnRateHour;
     private String birthday;
     private String headerVal;
+    private String timeZ;
     private int steps,calories,totalCals,totalSteps;
     private int age;
     private long milisecondsMidnight;
@@ -117,13 +120,20 @@ public class Controller {
         Log.d("Yesteday was ", " " + yesterdayDate);
     }
 
+
+    // Sony Life Log accepterar ej +? Måste konvertera + till %2B?
+
     public void setTime(){
         Calendar c = Calendar.getInstance();
-
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         df.setTimeZone(TimeZone.getDefault());
         this.theTime = df.format(c.getTime());
-        Log.d("Time is ", " " + TimeZone.getDefault());
+        DateTimeZone theTimeZone = DateTimeZone.forID( DateTimeZone.forTimeZone(TimeZone.getDefault()).toString());
+        DateTime now = DateTime.now( theTimeZone );
+        timeZ = now.toString().substring(23);
+        timeZ = timeZ.replace(":","");
+        timeZ = timeZ.replace("+","%2B");
+        Log.d("Time is ", " " + timeZ);
     }
 
     public void setHeader(String headerVal){
@@ -185,10 +195,12 @@ public class Controller {
     public void updateInfo(){
        // api.renewToken();
         if(userCharacter.getAge() == 0){
+            Log.d("Update First", "IS first day");
             isFirst = true;
             api.isFirstDay(true);
             api.forRefresh();
         }else{
+            Log.d("Update Not First", "Not first day");
             isFirst = false;
             api.isFirstDay(false);
             api.forRefresh();
@@ -198,15 +210,10 @@ public class Controller {
 
     public void calcCalories(){
         if(isFirst == true){
-            Calendar m = Calendar.getInstance(); //midnight
-            m.set(Calendar.HOUR_OF_DAY, 0);
-            m.set(Calendar.MINUTE, 0);
-            m.set(Calendar.SECOND, 0);
-            m.set(Calendar.MILLISECOND, 0);
-            long diff = (userCharacter.getBirthFromMidnight() - m.getTimeInMillis());
-            double fromMidnight = 1 + ((double)diff / (double)(1000*60*60));
-            calories = (int) (aee + (bmr* (24-fromMidnight)));
-            Log.d("Calcing First", calories + " Time: " + (24-fromMidnight));
+
+            double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+            calories = (int) (aee + (bmr * fromMidnight));
+            Log.d("Calcing First", calories + " Time: " + (fromMidnight));
         }else
         calories = (int) (aee + (bmr * hoursSinceMidnight));
         Log.d("CALORIES BURNT  ", calories + "" );
@@ -214,17 +221,16 @@ public class Controller {
 
     public void hoursMidnight(){
         Calendar c = Calendar.getInstance(); //now
-        milisecondsMidnight = c.getTimeInMillis();
-
         Calendar m = Calendar.getInstance(); //midnight
         m.set(Calendar.HOUR_OF_DAY, 0);
         m.set(Calendar.MINUTE, 0);
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         long diff = (c.getTimeInMillis() - m.getTimeInMillis());
+        milisecondsMidnight = diff;
         Log.d(" Differnece", diff + "");
-        hoursSinceMidnight = 1 + ((double)diff / (double)(1000*60*60));
-        Log.d("HOURS SINCE MIDNIGHT " + hoursSinceMidnight, " " + " TOTAL  MIN : " + milisecondsMidnight + " MILIS : " + c.getTimeInMillis());
+        hoursSinceMidnight = ((double)diff / (double)(1000*60*60));
+        Log.d("HOURS SINCE MIDNIGHT " + hoursSinceMidnight, " " + " TOTAL  MIN : " + milisecondsMidnight + " MILIS : " + diff);
     }
 
     public String getDate(){
@@ -278,7 +284,6 @@ public class Controller {
 
 
     public void initiateChar(){
-        db.setLastLogin(todaysDate,userName);
         calculateTotalCals();
         calculateTotalSteps();
         setCalToBeBurnt();
@@ -291,7 +296,7 @@ public class Controller {
 
     public void createCharacter(){
             Log.d(" MILI  ", milisecondsMidnight + "");
-            userCharacter = db.createCharacter(userName,todaysDate,milisecondsMidnight);
+            userCharacter = db.createCharacter(userName,todaysDate,milisecondsMidnight,timeZ);
             Log.d("Recieved Charac: ", "\nSteps: " + userCharacter.getTotalSteps() + "\nCals: " + userCharacter.getTotalCal());
     }
 
@@ -302,7 +307,7 @@ public class Controller {
         DateTime today = new DateTime(Integer.parseInt(splitToday[0]),Integer.parseInt(splitToday[1]),Integer.parseInt(splitToday[2]),0,0);
         Days day = Days.daysBetween(birth,today);
         userCharacter.setAge(day.getDays());
-        Log.d("Chars Age is: " , userCharacter.getAge() + " Days");
+        Log.d("Chars Age is: " , userCharacter.getAge() + " Days" + todaysDate);
     }
 
     public void calculateTotalCals(){
@@ -331,8 +336,14 @@ public class Controller {
         return this.totalSteps;
     }
 
+    public int getTodaySteps(){
+        return this.steps;
+    }
 
-    //TODO FIXA KLOCKA SEN FÖDSEL
+    public int getTodayCals(){
+        return  this.calories;
+    }
+
     public void setCalToBeBurnt(){
         Calendar c = Calendar.getInstance();
         Calendar m = Calendar.getInstance(); //midnight
@@ -341,14 +352,14 @@ public class Controller {
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         Log.d("What is NULL?", " AGE? " + userCharacter.getAge() + " CALSBURN?" + calorieBurnDay + " HSM? " + hoursSinceMidnight + "brH?" + burnRateHour+ "BFM? " + userCharacter.getBirthFromMidnight());
-        long diff = (userCharacter.getBirthFromMidnight() - m.getTimeInMillis());
-        double fromMidnight = 1 + ((double)diff / (double)(1000*60*60));
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
         Log.d("Check Midnight", "Mid: " + hoursSinceMidnight + " Night: " + fromMidnight );
         if(isFirst == true){
-            double first = 1 + ((double)c.getTimeInMillis() / (double)(1000*60*60));
+            double first = ((double)c.getTimeInMillis() / (double)(1000*60*60));
             toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (first*burnRateHour);
             Log.d(" CREATION ", first + "");
         }else {
+            Log.d("Second Timer", fromMidnight + "");
             toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (fromMidnight * burnRateHour);
         }
         Log.d("Calories To have Burnt:", " " + toHaveBeenBurnt);
@@ -362,6 +373,7 @@ public class Controller {
         if(userCharacter.getAge()!=0 && !userCharacter.getLastLogin().equals(todaysDate)) {
             Log.d("Uploading data", " from: " + yesterdayDate);
             if(userCharacter.getAge() == 1){
+                Log.d("Uploading Spec", "Specii");
                 api.getSpecYesterday();
             }else
             api.getYesterdayActivties();
@@ -378,6 +390,7 @@ public class Controller {
             }
         }
 
+        db.setLastLogin(todaysDate,userName);
     }
 
     public void uploadYesterday(int ySteps, double yAee){
@@ -399,6 +412,10 @@ public class Controller {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         Log.d(" Check Upload First ", sdf.format(cal.getTime()));
         return sdf.format(cal.getTime());
+    }
+
+    public String getTimeZone(){
+        return this.timeZ;
     }
 
     //TODO Determine which Spine animation to load on start and update
