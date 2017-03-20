@@ -2,13 +2,13 @@ package com.examen.aloglife;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
@@ -35,12 +35,14 @@ public class Controller {
     private String headerVal;
     private String timeZ;
     private int steps,calories,totalCals,totalSteps;
+    private int fontColor;
     private int age;
     private long milisecondsMidnight;
     private Double aee,hoursSinceMidnight, toHaveBeenBurnt;
     private DatabaseConnect db;
     private AndroidLauncher al;
     private Character userCharacter;
+    private String lastLoginBefore;
     private volatile boolean isFirst = false;
 
 
@@ -184,7 +186,8 @@ public class Controller {
             @Override
             public void run() {
         //        calculateCharsAge();
-        //        calculateTotalSteps();
+                calculateTotalSteps();
+                calculateTotalCals();
                 al.initiateSpineView(SPINEVIEW.NORMAL);
                 al.updateInfo(steps,calories);
                 al.refreshComplete();
@@ -275,7 +278,7 @@ public class Controller {
         calculateCalorieIntake();
         if(checkExistingChar()){
             userCharacter = db.getCharacter(userName);
-            Log.d("Characther exists", userCharacter.getTotalCal() + " steps: " + userCharacter.getTotalCal() + " MILI " + milisecondsMidnight);
+            Log.d("Characther exists", userCharacter.getTotalCal() + " steps: " + userCharacter.getTotalSteps() + " MILI " + milisecondsMidnight);
         }else{
             createCharacter();
         }
@@ -287,7 +290,7 @@ public class Controller {
         calculateTotalCals();
         calculateTotalSteps();
         setCalToBeBurnt();
-        setSpineToLoad();
+        setParametersToLoad();
     }
 
     public boolean checkExistingChar(){
@@ -369,12 +372,14 @@ public class Controller {
     public void checkIfUpload(){
 
         Log.d("Checking Upload: ", "Age: " + userCharacter.getAge() + " LastLogin: " + userCharacter.getLastLogin() + " Today Is: " + todaysDate );
+        lastLoginBefore = userCharacter.getLastLogin();
 
         if(userCharacter.getAge()!=0 && !userCharacter.getLastLogin().equals(todaysDate)) {
             Log.d("Uploading data", " from: " + yesterdayDate);
-            if(userCharacter.getAge() == 1){
+            if(userCharacter.getFirstday() == 0 && userCharacter.getAge() > 0){
                 Log.d("Uploading Spec", "Specii");
                 api.getSpecYesterday();
+                db.setFirstday(userCharacter.getUsername());
             }else
             api.getYesterdayActivties();
         }else{
@@ -418,10 +423,31 @@ public class Controller {
         return this.timeZ;
     }
 
+    public int getFontColor(){
+        return this.fontColor;
+    }
+
+    public String getLastLoginSession(){
+        return this.lastLoginBefore;
+    }
+
     //TODO Determine which Spine animation to load on start and update
     // Determined by total calories burnt factor
-    public void setSpineToLoad(){
+    public void setParametersToLoad(){
+        int calDiff = (int) (totalCals - toHaveBeenBurnt);
         selectedView = SPINEVIEW.NORMAL;
+
+        if(calDiff <= 200 || -200 <= calDiff){
+            fontColor = Color.YELLOW;
+        }
+
+        if(calDiff > 200){
+            fontColor = Color.GREEN;
+        }
+
+        if(calDiff < -200){
+            fontColor = Color.RED;
+        }
     }
 
 }

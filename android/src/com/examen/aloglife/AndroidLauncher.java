@@ -28,7 +28,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
 	private Button stepsBtn,calBtn,ageBtn;
 	private int stepsToday, caloriesToday;
-	private int timer;
+	private int timer,fontColor;
 	private Double bmr,weight,height;
 	private Controller cont;
 	private String authCode,refToken,header,userName,birthday;
@@ -38,6 +38,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private boolean ageIs = false,stepsIs = false,calIs = false;
 	private float centerX,centerY,screenH,screenW;
 	private AndroidApplicationConfiguration cfg;
+	private boolean isPause = false;
 
 
 	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -65,7 +66,7 @@ public class AndroidLauncher extends AndroidApplication {
 		ageBtn.setOnClickListener(new OnAgeClick());
 		cfg = new AndroidApplicationConfiguration();
 		cfg.r = cfg.g = cfg.b = cfg.a = 8;
-
+		fontColor = cont.getFontColor();
 		getCenter();
 		setTexts();
 
@@ -87,7 +88,7 @@ public class AndroidLauncher extends AndroidApplication {
 
 		switch(toPlay){
 			case NORMAL:
-				Boggi idle = new Boggi(centerX,centerY);
+				SimpleTest2 idle = new SimpleTest2();
 				spineView.addView(initializeForView(idle,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
@@ -96,7 +97,13 @@ public class AndroidLauncher extends AndroidApplication {
 				}
 				break;
 			case FAT:
-				spineView.addView(initializeForView(new SimpleTestLog(),cfg));
+				Bounding idleFat = new Bounding(centerX,centerY);
+				spineView.addView(initializeForView(idleFat,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
 				break;
 		}
 
@@ -119,7 +126,8 @@ public class AndroidLauncher extends AndroidApplication {
 	}
 
 	public void setTexts(){
-		Log.d("Setting Texts", "Steps " + cont.getTodaySteps());
+		Log.d("Setting Texts", "Steps " + cont.getTodaySteps() + "FONT COLOR: " + fontColor);
+		calBtn.setTextColor(fontColor);
 		stepsBtn.setText("Steps: " + cont.getTodaySteps());
 		calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
@@ -154,7 +162,8 @@ public class AndroidLauncher extends AndroidApplication {
 		this.stepsToday = stepsTotal;
 		this.caloriesToday = calories;
 
-		Log.d("Refresh status is: " , stepsIs + "" + calIs + ageIs + "");
+		Log.d("Refresh status is: " , stepsIs + "" + calIs + ageIs + " COLOR FONT NOW" + cont.getFontColor());
+		calBtn.setTextColor(cont.getFontColor());
 
 		if(stepsIs == false){
 			stepsBtn.setText("Steps: " + stepsToday);
@@ -178,12 +187,12 @@ public class AndroidLauncher extends AndroidApplication {
 		swipeContainer.setRefreshing(false);
 	}
 
-	protected void launchApp(String packageName) {
+	protected void launchApp() {
 		Intent mIntent = getPackageManager().getLaunchIntentForPackage(
-				packageName);
+				"com.sonymobile.lifelog");
 		if (mIntent != null) {
 			try {
-				sendBroadcast(mIntent);
+				startActivity(mIntent);
 			} catch (ActivityNotFoundException err) {
 				Toast t = Toast.makeText(getApplicationContext(),
 						"App not found", Toast.LENGTH_SHORT);
@@ -211,8 +220,6 @@ public class AndroidLauncher extends AndroidApplication {
 
 
 	}
-
-	//TODO CREATE REVERSE WHEN CLICKED
 
 	private class OnStepsClick implements View.OnClickListener{
 
@@ -254,6 +261,23 @@ public class AndroidLauncher extends AndroidApplication {
 				ageIs = true;
 			}
 		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.d("Is Resume ", "RESUMING");
+		if(isPause == true){
+			cont.updateInfo();
+			isPause = false;
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		isPause = true;
+		Log.d("Is Pause", "PAUSING");
 	}
 
 }

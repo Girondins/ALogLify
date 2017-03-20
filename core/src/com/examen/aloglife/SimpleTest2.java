@@ -10,7 +10,6 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
@@ -22,72 +21,49 @@ import spine.Skeleton;
 import spine.SkeletonBounds;
 import spine.SkeletonData;
 import spine.SkeletonJson;
-import spine.SkeletonMeshRenderer;
 import spine.SkeletonRenderer;
 import spine.SkeletonRendererDebug;
 
-public class Boggi extends ApplicationAdapter {
+public class SimpleTest2 extends ApplicationAdapter {
     OrthographicCamera camera;
-    PolygonSpriteBatch batch;
-    SkeletonMeshRenderer renderer;
+    SpriteBatch batch;
+    SkeletonRenderer renderer;
     SkeletonRendererDebug debugRenderer;
+
+    TextureAtlas atlas;
+    Skeleton skeleton;
     SkeletonBounds bounds;
-
-    TextureAtlas atlas, loggiAtl;
-    Skeleton skeleton, loggiSkel;
-    AnimationState state,loggiState;
-
-    private float centerX,centerY;
-
-    public Boggi(float centerX, float centerY){
-        this.centerX = centerX;
-        this.centerY = centerY;
-    }
+    AnimationState state;
 
     public void create () {
         camera = new OrthographicCamera();
-        batch = new PolygonSpriteBatch(); // Required to render meshes. SpriteBatch can't render meshes.
-        renderer = new SkeletonMeshRenderer();
+        batch = new SpriteBatch();
+        renderer = new SkeletonRenderer();
         renderer.setPremultipliedAlpha(true);
         debugRenderer = new SkeletonRendererDebug();
-        debugRenderer.setMeshTriangles(false);
-        debugRenderer.setRegionAttachments(false);
-        debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("boggi/boggi_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-        json.setScale(1f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("boggi/boggi.json"));
+        json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-        skeleton.setPosition(centerX, 170);
+        skeleton.setPosition(250, 20);
+        skeleton.setAttachment("head-bb", "head"); // Attach "head" bounding box to "head-bb" slot.
 
-        bounds = new SkeletonBounds();
-
-
+        bounds = new SkeletonBounds(); // Convenience class to do hit detection with bounding boxes.
 
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-        stateData.setMix("idlenormal", "jumpNormal", 0.2f);
-        stateData.setMix("jumpNormal", "idlenormal", 0.2f);
+        stateData.setMix("run", "jump", 0.2f);
+        stateData.setMix("jump", "run", 0.2f);
+        stateData.setMix("jump", "jump", 0);
+
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-        state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
-
-        // Queue animations on tracks 0 and 1.
-        state.setAnimation(0, "idlenormal", true);
+        state.setTimeScale(0.3f); // Slow all animations down to 30% speed.
 
 
-
-        loggiAtl = new TextureAtlas(Gdx.files.internal("loggi/LoggiBoy_tex.atlas"));
-        SkeletonJson jsonAtl = new SkeletonJson(loggiAtl); // This loads skeleton JSON data, which is stateless.
-        jsonAtl.setScale(0.3f); // Load the skeleton at 60% the size it was in Spine.
-        SkeletonData skeletonDataLog = jsonAtl.readSkeletonData(Gdx.files.internal("loggi/LoggiBoy.json"));
-
-        loggiSkel  = new Skeleton(skeletonDataLog);
-        loggiSkel.setPosition(150,350);
-
-     // Keys in higher tracks override the pose from lower tracks.
-
-
+        // Set animation on track 0.
+        state.setAnimation(0, "run", true);
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             final Vector3 point = new Vector3();
@@ -96,31 +72,26 @@ public class Boggi extends ApplicationAdapter {
                 camera.unproject(point.set(screenX, screenY, 0)); // Convert window to world coordinates.
                 bounds.update(skeleton, true); // Update SkeletonBounds with current skeleton bounding box positions.
                 if (bounds.aabbContainsPoint(point.x, point.y)) { // Check if inside AABB first. This check is fast.
-                    state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-                    state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
+                    BoundingBoxAttachment hit = bounds.containsPoint(point.x, point.y); // Check if inside a bounding box.
+                    if (hit != null) {
+                        System.out.println("hit: " + hit);
+                        skeleton.findSlot("head").getColor().set(Color.RED); // Turn head red until touchUp.
+                    }
                 }
                 return true;
             }
 
             public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-        //        state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-       //         state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
+                skeleton.findSlot("head").getColor().set(Color.WHITE);
                 return true;
             }
 
             public boolean keyDown (int keycode) {
-                state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-                state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
+                state.setAnimation(0, "jump", false); // Set animation on track 0 to jump.
+                state.addAnimation(0, "run", true, 0); // Queue run to play after jump.
                 return true;
             }
         });
-
-
-
-
-
-
-
     }
 
     public void render () {
@@ -130,7 +101,7 @@ public class Boggi extends ApplicationAdapter {
 
         state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
         skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
-        loggiSkel.updateWorldTransform();
+
         // Configure the camera, SpriteBatch, and SkeletonRendererDebug.
         camera.update();
         batch.getProjectionMatrix().set(camera.combined);
@@ -138,8 +109,9 @@ public class Boggi extends ApplicationAdapter {
 
         batch.begin();
         renderer.draw(batch, skeleton); // Draw the skeleton images.
-        renderer.draw(batch, loggiSkel);
         batch.end();
+
+        debugRenderer.draw(skeleton); // Draw debug lines.
     }
 
     public void resize (int width, int height) {
@@ -149,5 +121,6 @@ public class Boggi extends ApplicationAdapter {
     public void dispose () {
         atlas.dispose();
     }
+
 
 }

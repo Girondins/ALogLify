@@ -444,10 +444,10 @@ public class ApiConnector {
     }
 
     private class GetYesterdayActivties implements Runnable {
-        private String yesterday,today,timeZone;
+        private String yesterdays,today,timeZone;
 
         public GetYesterdayActivties(){
-            this.yesterday = cont.getYesterday();
+            this.yesterdays = cont.getLastLoginSession();
             this.today = cont.getDate();
             this.timeZone = cont.getTimeZone();
         }
@@ -464,7 +464,7 @@ public class ApiConnector {
                     e.printStackTrace();
                 }
             }
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T00:00:01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterdays +"T00:00:01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
             Log.d("Act", res);
             Log.d("EXtract Yesteday", " JEPP");
             extractYesterday(res);
@@ -473,10 +473,10 @@ public class ApiConnector {
     }
 
     private class GetSpecificYesterday implements Runnable{
-        private String yesterday,today,startTime,timeZone;
+        private String yesterdays,today,startTime,timeZone;
 
         public GetSpecificYesterday(){
-            this.yesterday = cont.getYesterday();
+            this.yesterdays = cont.getLastLoginSession();
             this.today = cont.getDate();
             this.startTime = cont.firstTimer();
             this.timeZone = cont.getTimeZone();
@@ -494,7 +494,7 @@ public class ApiConnector {
                     e.printStackTrace();
                 }
             }
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterday +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterdays +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
             Log.d("Act", res);
             Log.d("EXtract Yesteday", " JEPP");
             extractYesterday(res);

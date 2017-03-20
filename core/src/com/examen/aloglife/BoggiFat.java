@@ -7,12 +7,11 @@ package com.examen.aloglife;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import spine.AnimationState;
@@ -23,10 +22,10 @@ import spine.SkeletonBounds;
 import spine.SkeletonData;
 import spine.SkeletonJson;
 import spine.SkeletonMeshRenderer;
-import spine.SkeletonRenderer;
 import spine.SkeletonRendererDebug;
+import sun.rmi.runtime.Log;
 
-public class Boggi extends ApplicationAdapter {
+public class BoggiFat extends ApplicationAdapter {
     OrthographicCamera camera;
     PolygonSpriteBatch batch;
     SkeletonMeshRenderer renderer;
@@ -39,7 +38,7 @@ public class Boggi extends ApplicationAdapter {
 
     private float centerX,centerY;
 
-    public Boggi(float centerX, float centerY){
+    public BoggiFat(float centerX, float centerY){
         this.centerX = centerX;
         this.centerY = centerY;
     }
@@ -54,27 +53,23 @@ public class Boggi extends ApplicationAdapter {
         debugRenderer.setRegionAttachments(false);
         debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("boggi/boggi_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("boggiefat/boggieFAT_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(1f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("boggi/boggi.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("boggiefat/boggieFAT.json"));
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-        skeleton.setPosition(centerX, 170);
-
+        skeleton.setAttachment("white","white");
+        skeleton.setPosition(centerX,170);
         bounds = new SkeletonBounds();
 
-
-
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-        stateData.setMix("idlenormal", "jumpNormal", 0.2f);
-        stateData.setMix("jumpNormal", "idlenormal", 0.2f);
+
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
         state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
 
         // Queue animations on tracks 0 and 1.
-        state.setAnimation(0, "idlenormal", true);
-
+        state.setAnimation(0, "idleFat_Glasses", true);
 
 
         loggiAtl = new TextureAtlas(Gdx.files.internal("loggi/LoggiBoy_tex.atlas"));
@@ -85,9 +80,8 @@ public class Boggi extends ApplicationAdapter {
         loggiSkel  = new Skeleton(skeletonDataLog);
         loggiSkel.setPosition(150,350);
 
+
      // Keys in higher tracks override the pose from lower tracks.
-
-
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             final Vector3 point = new Vector3();
@@ -95,16 +89,24 @@ public class Boggi extends ApplicationAdapter {
             public boolean touchDown (int screenX, int screenY, int pointer, int button) {
                 camera.unproject(point.set(screenX, screenY, 0)); // Convert window to world coordinates.
                 bounds.update(skeleton, true); // Update SkeletonBounds with current skeleton bounding box positions.
-                if (bounds.aabbContainsPoint(point.x, point.y)) { // Check if inside AABB first. This check is fast.
-                    state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-                    state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
+                System.out.println("x : " + screenX + " y : " + screenY + "\n" +
+                                    "Bounds x: " + bounds.getMinX() + " Max: " + bounds.getMaxX() + "\n" +
+                                    "Bounds y: " + bounds.getMinY() + " Max: " + bounds.getMaxY());
+                if (bounds.aabbContainsPoint(screenX, screenY)) {
+                    BoundingBoxAttachment box = bounds.containsPoint(screenX,screenY);
+                    if(box != null) {
+                        System.out.println(" WOOOOOO O O OO ");
+                        skeleton.setFlipX(true);// Check if inside AABB first. This check is fast.
+                        state.setAnimation(0, "walkingFAt", false); // Set animation on track 0 to jump.
+                        state.addAnimation(0, "idleFat_Glasses", true, 0); // Queue run to play after jump.
+                    }
                 }
                 return true;
             }
 
             public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-        //        state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-       //         state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
+                //        state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
+                //         state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
                 return true;
             }
 
@@ -114,8 +116,6 @@ public class Boggi extends ApplicationAdapter {
                 return true;
             }
         });
-
-
 
 
 
@@ -137,8 +137,8 @@ public class Boggi extends ApplicationAdapter {
         debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
         batch.begin();
-        renderer.draw(batch, skeleton); // Draw the skeleton images.
         renderer.draw(batch, loggiSkel);
+        renderer.draw(batch, skeleton); // Draw the skeleton images.
         batch.end();
     }
 
