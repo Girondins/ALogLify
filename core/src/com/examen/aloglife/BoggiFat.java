@@ -68,8 +68,14 @@ public class BoggiFat extends ApplicationAdapter {
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
         state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
 
+
+        stateData.setMix("idleFat_Glasses", "walkingFAt", 0.2f);
+        stateData.setMix("walkingFAt", "idleFat_Glasses", 0.2f);
+
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "idleFat_Glasses", true);
+        state.addAnimation(0, "walkingFAt", false,2);
+        state.addAnimation(0, "idleFat_Glasses", true, 0);
 
 
         loggiAtl = new TextureAtlas(Gdx.files.internal("loggi/LoggiBoy_tex.atlas"));

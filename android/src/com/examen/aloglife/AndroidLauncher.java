@@ -13,7 +13,9 @@ import android.view.Display;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -26,7 +28,8 @@ import static com.examen.aloglife.Controller.SPINEVIEW.NORMAL;
 
 public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
-	private Button stepsBtn,calBtn,ageBtn;
+	private Button stepsBtn,calBtn,ageBtn,comBtn,intBtn;
+	private TextView infoTextview;
 	private int stepsToday, caloriesToday;
 	private int timer,fontColor;
 	private Double bmr,weight,height;
@@ -39,6 +42,14 @@ public class AndroidLauncher extends AndroidApplication {
 	private float centerX,centerY,screenH,screenW;
 	private AndroidApplicationConfiguration cfg;
 	private boolean isPause = false;
+	private LinearLayout starView,infoView;
+
+
+	//For InfoView
+	private TextView infoBirth,infoName,infoCal,infoStep,infoCom;
+	private RelativeLayout boogieView;
+	private Button returnBtn;
+
 
 
 	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -57,13 +68,20 @@ public class AndroidLauncher extends AndroidApplication {
 
 	@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR2)
 	public void initiateComp(){
+		starView = (LinearLayout) findViewById(R.id.startViewID);
+		infoView = (LinearLayout) findViewById(R.id.infoViewID);
 		spineView = (RelativeLayout) findViewById(R.id.spineViewID);
 		stepsBtn = (Button) findViewById(R.id.stepsBTN);
 		calBtn = (Button) findViewById(R.id.calBTN);
 		ageBtn = (Button) findViewById(R.id.ageBTN);
+		comBtn = (Button) findViewById(R.id.commBtnID);
+		intBtn = (Button) findViewById(R.id.interactBtnID);
+		infoTextview = (TextView) findViewById(R.id.infoTextID);
 		stepsBtn.setOnClickListener(new OnStepsClick());
 		calBtn.setOnClickListener(new OnCalorieClick());
 		ageBtn.setOnClickListener(new OnAgeClick());
+		comBtn.setOnClickListener(new OnComClick());
+		intBtn.setOnClickListener(new OnIntClick());
 		cfg = new AndroidApplicationConfiguration();
 		cfg.r = cfg.g = cfg.b = cfg.a = 8;
 		fontColor = cont.getFontColor();
@@ -88,7 +106,7 @@ public class AndroidLauncher extends AndroidApplication {
 
 		switch(toPlay){
 			case NORMAL:
-				SimpleTest2 idle = new SimpleTest2();
+				Bounding idle = new Bounding(centerX,centerY);
 				spineView.addView(initializeForView(idle,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
@@ -97,7 +115,7 @@ public class AndroidLauncher extends AndroidApplication {
 				}
 				break;
 			case FAT:
-				Bounding idleFat = new Bounding(centerX,centerY);
+				BoggiFat idleFat = new BoggiFat(centerX,centerY);
 				spineView.addView(initializeForView(idleFat,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
@@ -131,6 +149,7 @@ public class AndroidLauncher extends AndroidApplication {
 		stepsBtn.setText("Steps: " + cont.getTodaySteps());
 		calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
+		infoTextview.setText("Character for account: " + userName);
 	}
 
 	public void setupController(){
@@ -172,8 +191,10 @@ public class AndroidLauncher extends AndroidApplication {
 		}
 		if(calIs == false) {
 			calBtn.setText("Cal Burnt: " + calories);
+			infoTextview.setText("Have Burnt/Need to burn: " + cont.getTotalCals() + " / " + cont.getToHaveBurntCal() + " cal");
 		}else {
 			calBtn.setText("Total Cals: " + cont.getTotalCals());
+			infoTextview.setText("Have Burnt/Need to burn: " + cont.getTotalCals() + " / " + cont.getToHaveBurntCal() + " cal");
 		}
 		if(ageIs == false) {
 			ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
@@ -181,6 +202,10 @@ public class AndroidLauncher extends AndroidApplication {
 			ageBtn.setText("Born: " + cont.getCharacterBirth());
 		}
 
+	}
+
+	public void updateTimer(int time){
+		intBtn.setText("Time spent: " + time);
 	}
 
 	public void refreshComplete(){
@@ -199,6 +224,29 @@ public class AndroidLauncher extends AndroidApplication {
 				t.show();
 			}
 		}
+	}
+
+	public void initiateInfoViewComp(){
+		infoBirth = (TextView) findViewById(R.id.textInfoBirth);
+		infoName = (TextView) findViewById(R.id.textInfoName);
+		infoCal = (TextView) findViewById(R.id.textInfoCalories);
+		infoStep = (TextView) findViewById(R.id.textInfoSteps);
+		infoCom = (TextView) findViewById(R.id.textInfoComm);
+		boogieView = (RelativeLayout) findViewById(R.id.boogieViewID);
+		returnBtn = (Button) findViewById(R.id.returnBtnID);
+		returnBtn.setOnClickListener(new OnRtnClick());
+
+		BoggiFat idleFat = new BoggiFat(centerX,centerY);
+		boogieView.addView(initializeForView(idleFat,cfg));
+		if (graphics.getView() instanceof SurfaceView) {
+			SurfaceView glView = (SurfaceView) graphics.getView();
+			glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+			glView.setZOrderOnTop(true);
+		}
+
+
+
+
 	}
 
 	@Override
@@ -241,9 +289,11 @@ public class AndroidLauncher extends AndroidApplication {
 		public void onClick(View view) {
 			if(calIs){
 				calBtn.setText("Cal Burnt: " + cont.getTodayCals());
+				infoTextview.setText("Have Burnt/Need to burn: " + cont.getTotalCals() + " / " + cont.getToHaveBurntCal() + " cal");
 				calIs = false;
 			}else{
 				calBtn.setText("Total Cals: " + cont.getTotalCals());
+				infoTextview.setText("Have Burnt/Need to burn: " + cont.getTotalCals() + " / " + cont.getToHaveBurntCal() + " cal");
 				calIs = true;
 			}
 		}
@@ -263,12 +313,41 @@ public class AndroidLauncher extends AndroidApplication {
 		}
 	}
 
+	private class OnComClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+			spineView.removeAllViews();
+			initiateInfoViewComp();
+			starView.setVisibility(View.GONE);
+			infoView.setVisibility(View.VISIBLE);
+		}
+	}
+
+	private class OnIntClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+		}
+	}
+
+	private class OnRtnClick implements View.OnClickListener{
+
+		@Override
+		public void onClick(View view) {
+			boogieView.removeAllViews();
+			infoView.setVisibility(View.GONE);
+			starView.setVisibility(View.VISIBLE);
+		}
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d("Is Resume ", "RESUMING");
 		if(isPause == true){
 			cont.updateInfo();
+			cont.resumeTimer();
 			isPause = false;
 		}
 	}
@@ -277,6 +356,7 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onPause() {
 		super.onPause();
 		isPause = true;
+		cont.stopTimer();
 		Log.d("Is Pause", "PAUSING");
 	}
 

@@ -36,7 +36,7 @@ public class Controller {
     private String timeZ;
     private int steps,calories,totalCals,totalSteps;
     private int fontColor;
-    private int age;
+    private int age,timer = 0;
     private long milisecondsMidnight;
     private Double aee,hoursSinceMidnight, toHaveBeenBurnt;
     private DatabaseConnect db;
@@ -44,6 +44,7 @@ public class Controller {
     private Character userCharacter;
     private String lastLoginBefore;
     private volatile boolean isFirst = false;
+    private TakeTime tTime;
 
 
     public static enum SPINEVIEW{
@@ -70,6 +71,8 @@ public class Controller {
         this.weight = weight;
         this.bmr = bmr;
         this.birthday = birthday;
+        tTime = new TakeTime();
+        tTime.start();
         setDate();
         setTime();
         getCharacter();
@@ -357,14 +360,9 @@ public class Controller {
         Log.d("What is NULL?", " AGE? " + userCharacter.getAge() + " CALSBURN?" + calorieBurnDay + " HSM? " + hoursSinceMidnight + "brH?" + burnRateHour+ "BFM? " + userCharacter.getBirthFromMidnight());
         double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
         Log.d("Check Midnight", "Mid: " + hoursSinceMidnight + " Night: " + fromMidnight );
-        if(isFirst == true){
-            double first = ((double)c.getTimeInMillis() / (double)(1000*60*60));
-            toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (first*burnRateHour);
-            Log.d(" CREATION ", first + "");
-        }else {
-            Log.d("Second Timer", fromMidnight + "");
-            toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (fromMidnight * burnRateHour);
-        }
+        Log.d("Second Timer", fromMidnight + "");
+        toHaveBeenBurnt = ((userCharacter.getAge()) * calorieBurnDay) + (hoursSinceMidnight * burnRateHour) - (fromMidnight * burnRateHour);
+
         Log.d("Calories To have Burnt:", " " + toHaveBeenBurnt);
         Log.d("Calories you have burn:", " " + totalCals);
     }
@@ -396,6 +394,7 @@ public class Controller {
         }
 
         db.setLastLogin(todaysDate,userName);
+
     }
 
     public void uploadYesterday(int ySteps, double yAee){
@@ -403,8 +402,12 @@ public class Controller {
         Log.d("Uploading: " , yCals + " and " + ySteps);
         db.uploadToDatabase(userName,yCals,ySteps);
      //   api.setWait(false);
+    }
 
-
+    public void uploadSpeciYesteday(int ySteps, double yAee){
+        long hoursToUpload = 24 - (userCharacter.getBirthFromMidnight() / (1000*60*60));
+        int yCals = (int) (yAee + (bmr * hoursToUpload));
+        db.uploadToDatabase(userName,yCals,ySteps);
     }
 
     public String firstTimer(){
@@ -427,6 +430,10 @@ public class Controller {
         return this.fontColor;
     }
 
+    public int getToHaveBurntCal(){
+        return this.toHaveBeenBurnt.intValue();
+    }
+
     public String getLastLoginSession(){
         return this.lastLoginBefore;
     }
@@ -447,6 +454,47 @@ public class Controller {
 
         if(calDiff < -200){
             fontColor = Color.RED;
+        }
+    }
+
+    public void stopTimer(){
+        tTime.stopTimer();
+    }
+
+    public void resumeTimer(){
+        tTime.resumeTimer();
+        tTime.start();
+    }
+
+    private class TakeTime extends Thread{
+        private volatile boolean running = true;
+
+        public void stopTimer(){
+            running = false;
+            Log.d("Timer: ", "Stop");
+        }
+
+        public void resumeTimer(){
+            running = true;
+            Log.d("Timer: ", "Start");
+        }
+
+        @Override
+        public void run() {
+            while(running){
+                timer++;
+                al.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        al.updateTimer(timer);
+                    }
+                });
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

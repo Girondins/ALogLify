@@ -45,6 +45,7 @@ public class ApiConnector {
     private volatile boolean isForUpload = true;
     private volatile boolean isFirstDay = false;
     private volatile boolean isRefresh = false;
+    private volatile boolean isSpecYest = false;
     private final String CLIENT_ID ="daacd362-05d2-4d15-ab2c-ed07848469d4";
     private final String CLIENT_SECRET="PEHQvGvZ7ml0qP9sgKoXiDw_Vqw";
     private String authCode;
@@ -275,20 +276,26 @@ public class ApiConnector {
                         Log.d("Details ", details.toString());
                         JSONArray steps = (JSONArray) details.get("steps");
                         JSONArray aee = (JSONArray) details.get("aee");
-                        for(int j = 0 ; j<steps.size(); j++){
-                            stepsCount += (Long) steps.get(j);
+                        if(steps != null) {
+                            for (int j = 0; j < steps.size(); j++) {
+                                stepsCount += (Long) steps.get(j);
+                            }
                         }
-                        for(int y = 0; y<aee.size(); y++){
-                            aeeCount += (Double) aee.get(y);
+                        if(aee != null) {
+                            for (int y = 0; y < aee.size(); y++) {
+                                aeeCount += (Double) aee.get(y);
+                            }
                         }
-                        cont.setSteps(stepsCount);
-                        cont.setAee(aeeCount);
-                        cont.calcCalories();
+
                         break;
                 }
 
+                cont.setSteps(stepsCount);
+                cont.setAee(aeeCount);
+                cont.calcCalories();
 
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -333,13 +340,18 @@ public class ApiConnector {
                         }
                         for(int y = 0; y<aee.size(); y++){
                             aeeCount += (Double) aee.get(y);
+                            Log.d("Per add Count: ", " "  + aeeCount);
                         }
                         break;
                 }
 
 
             }
+            Log.d(" CALI YESTER", aeeCount + "");
             Log.d(" API YESTER", stepsCount + "");
+            if(isSpecYest == true){
+                cont.uploadSpeciYesteday(stepsCount,aeeCount);
+            }else
             cont.uploadYesterday(stepsCount,aeeCount);
        //     getToday();
 
@@ -487,6 +499,7 @@ public class ApiConnector {
             isForUpload = false;
             renewToken();
             while(isForUpload == false){
+                Log.d("THIS IS LASTLOGIN: ", yesterdays);
                 try {
                     Thread.sleep(500);
                     Log.d("STUCK", "HELP");
@@ -494,8 +507,10 @@ public class ApiConnector {
                     e.printStackTrace();
                 }
             }
-            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterdays +"T"+ this.startTime +":01.000Z&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
+            Log.d(" THIS IS THE REQUEST : " , "https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterdays +"T"+ this.startTime +":01.000" +timeZone +"&end_time="+ this.today +"T00:00:01.000" + timeZone);
+            String res = makeServiceCall("https://platform.lifelog.sonymobile.com/v1/users/me/activities?start_time="+ this.yesterdays +"T"+ this.startTime +":01.000" +timeZone +"&end_time="+ this.today +"T00:00:01.000" + timeZone,1);
             Log.d("Act", res);
+            isSpecYest = true;
             Log.d("EXtract Yesteday", " JEPP");
             extractYesterday(res);
             //  renewToken();

@@ -4,49 +4,185 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeContainer"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="439dp"
-        android:layout_weight="0.1">
+        android:layout_height="603dp"
+        android:weightSum="1"
+        android:id="@+id/infoViewID"
+        android:visibility="gone"
+        >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="247dp"
-        android:id="@+id/spineViewID"
-        android:background="@drawable/walkpark">
+        <TextView
+            android:text="Overview"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:textSize="30dp"
+            android:gravity="center"/>
 
-    </RelativeLayout>
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:id="@+id/textInfoName"
+            android:layout_height="40dp" />
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:id="@+id/textInfoBirth"
+            android:layout_height="40dp" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/textInfoCalories" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/textInfoSteps" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/textInfoComm" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.28"
+            android:id="@+id/boogieViewID">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Boogie"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                />
+
+        </RelativeLayout>
+
+        <TextView
+            android:text="Acheivements:"
+            android:textSize="20dp"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="40dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.36"></LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.36"></LinearLayout>
+
+        <Button
+            android:text="Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/returnBtnID" />
+
+    </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.9">
+        android:id="@+id/startViewID"
+        android:weightSum="1">
 
-        <Button
-            android:text="Button"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/calBTN"
-            android:layout_weight="0.33" />
+            android:layout_height="match_parent"
+            android:layout_weight="0.2">
 
-        <Button
-            android:text="Button"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/stepsBTN"
-            android:layout_weight="0.33" />
+            android:layout_height="247dp"
+            android:id="@+id/spineViewID"
+            android:background="@drawable/walkpark">
 
-        <Button
-            android:text="Button"
+        </RelativeLayout>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ageBTN"
-            android:layout_weight="0.33" />
+            android:layout_height="match_parent"
+            android:layout_weight="0.8">
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2">
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/calBTN"
+                    android:layout_weight="0.33"
+                    android:textSize="10sp"/>
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stepsBTN"
+                    android:layout_weight="0.33"
+                    android:textSize="10sp"/>
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ageBTN"
+                    android:layout_weight="0.33"
+                    android:textSize="10sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2">
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/commBtnID"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/interactBtnID"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:id="@+id/infoTextID"
+                android:layout_weight="0.2"/>
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
