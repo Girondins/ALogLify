@@ -38,7 +38,7 @@ public class Controller {
     private int fontColor;
     private int age,timer = 0;
     private long milisecondsMidnight;
-    private Double aee,hoursSinceMidnight, toHaveBeenBurnt;
+    private Double aee,hoursSinceMidnight, toHaveBeenBurnt, midnightTime;
     private DatabaseConnect db;
     private AndroidLauncher al;
     private Character userCharacter;
@@ -191,7 +191,8 @@ public class Controller {
         //        calculateCharsAge();
                 calculateTotalSteps();
                 calculateTotalCals();
-                al.initiateSpineView(SPINEVIEW.NORMAL);
+                setParametersToLoad();
+                al.setSpineView(selectedView);
                 al.updateInfo(steps,calories);
                 al.refreshComplete();
             }
@@ -216,13 +217,13 @@ public class Controller {
 
     public void calcCalories(){
         if(isFirst == true){
-
             double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
-            calories = (int) (aee + (bmr * fromMidnight));
-            Log.d("Calcing First", calories + " Time: " + (fromMidnight));
-        }else
-        calories = (int) (aee + (bmr * hoursSinceMidnight));
-        Log.d("CALORIES BURNT  ", calories + "" );
+            calories = (int) (aee + (bmr * (hoursSinceMidnight - fromMidnight)));
+            Log.d("Calcing First", calories + " Time: " + (fromMidnight) + "Diff: " + hoursSinceMidnight);
+        }else {
+            calories = (int) (aee + (bmr * hoursSinceMidnight));
+            Log.d("CALORIES BURNT  ", calories + "" + " SINCE: " + hoursSinceMidnight);
+        }
     }
 
     public void hoursMidnight(){
@@ -441,6 +442,7 @@ public class Controller {
     //TODO Determine which Spine animation to load on start and update
     // Determined by total calories burnt factor
     public void setParametersToLoad(){
+        Log.d(" PARA NULL" , totalCals + "  OR : " + toHaveBeenBurnt);
         int calDiff = (int) (totalCals - toHaveBeenBurnt);
         selectedView = SPINEVIEW.NORMAL;
 

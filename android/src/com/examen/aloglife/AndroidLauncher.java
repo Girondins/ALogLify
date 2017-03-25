@@ -61,7 +61,7 @@ public class AndroidLauncher extends AndroidApplication {
 		setupController();
 		initiateComp();
 		initiateSwipe();
-		initiateSpineView(selectedView);
+		initiateSpineView();
 
 
 	}
@@ -101,13 +101,13 @@ public class AndroidLauncher extends AndroidApplication {
 		centerX=screenW/2;
 	}
 
-	public void initiateSpineView(Controller.SPINEVIEW toPlay){
+	public void initiateSpineView(){
 		spineView.removeAllViews();
 
-		switch(toPlay){
+		switch(selectedView){
 			case NORMAL:
-				Bounding idle = new Bounding(centerX,centerY);
-				spineView.addView(initializeForView(idle,cfg));
+				Normal normal = new Normal(centerX,centerY);
+				spineView.addView(initializeForView(normal,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
 					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
@@ -150,6 +150,10 @@ public class AndroidLauncher extends AndroidApplication {
 		calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 		infoTextview.setText("Character for account: " + userName);
+	}
+
+	public void setSpineView(Controller.SPINEVIEW selectedView){
+		this.selectedView = selectedView;
 	}
 
 	public void setupController(){
@@ -338,6 +342,7 @@ public class AndroidLauncher extends AndroidApplication {
 			boogieView.removeAllViews();
 			infoView.setVisibility(View.GONE);
 			starView.setVisibility(View.VISIBLE);
+			initiateSpineView();
 		}
 	}
 

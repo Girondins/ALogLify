@@ -289,10 +289,11 @@ public class ApiConnector {
 
                         break;
                 }
-
+                Log.d("Aee is "  , "" + aeeCount);
                 cont.setSteps(stepsCount);
                 cont.setAee(aeeCount);
                 cont.calcCalories();
+         //       cont.setParametersToLoad();
 
             }
 
