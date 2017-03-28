@@ -6,10 +6,10 @@ package com.examen.aloglife;
 
 public class Character {
     private String username,dayofbirth,lastLogin,birthTimeZone;
-    private int totalSteps,totalCal,age,firstday;
+    private int totalSteps,totalCal,age,firstday,timeSpent,communication;
     private long birthFromMidnight;
 
-    public Character(String username,String dayofbirth, int totalCal, int totalSteps, long birthFromMidnight, String lastLogin,String birthTimeZone , int firstday){
+    public Character(String username,String dayofbirth, int totalCal, int totalSteps, long birthFromMidnight, String lastLogin,String birthTimeZone , int firstday, int timeSpent , int communication){
         this.username = username;
         this.dayofbirth = dayofbirth;
         this.totalCal = totalCal;
@@ -18,6 +18,8 @@ public class Character {
         this.lastLogin = lastLogin;
         this.birthTimeZone = birthTimeZone;
         this.firstday = firstday;
+        this.timeSpent = timeSpent;
+        this.communication = communication;
     }
 
     public void setAge(int age){
@@ -58,5 +60,13 @@ public class Character {
 
     public int getFirstday() {
         return this.firstday;
+    }
+
+    public int getTimeSpent(){
+        return this.timeSpent;
+    }
+
+    public int getCommunication(){
+        return this.communication;
     }
 }

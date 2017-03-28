@@ -258,7 +258,7 @@ public class ApiConnector {
     }
 
     public void extractActivity(String activityInfo){
-        int stepsCount = 0;
+        int stepsCount = 0, communicationCount = 0;
         Double aeeCount = 0.00;
         String type;
 
@@ -288,10 +288,33 @@ public class ApiConnector {
                         }
 
                         break;
+
+                    case "application":
+                        String startTime = (String) results.get("startTime");
+                        String endTime = (String) results.get("endTime");
+                        String subType = (String) results.get("subtype");
+                        String subStart = startTime.substring(11,19);
+                        String subEnd = endTime.substring(11,19);
+                        String splitStart[] = subStart.split(":");
+                        String splitEnd[] = subEnd.split(":");
+                        int startSeconds = convertToSeconds(Integer.parseInt(splitStart[0]),Integer.parseInt(splitStart[1]),Integer.parseInt(splitStart[2]));
+                        int endSeconds = convertToSeconds(Integer.parseInt(splitEnd[0]),Integer.parseInt(splitEnd[1]),Integer.parseInt(splitEnd[2]));
+                        int totalSeconds = endSeconds-startSeconds;
+
+                        switch(subType){
+                            case "communication":
+                                communicationCount += totalSeconds;
+                                break;
+
+                        }
+
+                        Log.d("Testing Application", subType.toString() + " start: " + subStart + " end: " + subEnd + " Seconds Spent: " + totalSeconds);
+                        break;
                 }
                 Log.d("Aee is "  , "" + aeeCount);
                 cont.setSteps(stepsCount);
                 cont.setAee(aeeCount);
+                cont.setCommunication(communicationCount);
                 cont.calcCalories();
          //       cont.setParametersToLoad();
 
@@ -320,7 +343,7 @@ public class ApiConnector {
     }
 
     public void extractYesterday(String yesterdayInfo){
-        int stepsCount = 0;
+        int stepsCount = 0, communicationCount = 0;
         Double aeeCount = 0.00;
         String type;
         try {
@@ -344,6 +367,28 @@ public class ApiConnector {
                             Log.d("Per add Count: ", " "  + aeeCount);
                         }
                         break;
+
+                    case "application":
+                        String startTime = (String) results.get("startTime");
+                        String endTime = (String) results.get("endTime");
+                        String subType = (String) results.get("subtype");
+                        String subStart = startTime.substring(11,19);
+                        String subEnd = endTime.substring(11,19);
+                        String splitStart[] = subStart.split(":");
+                        String splitEnd[] = subEnd.split(":");
+                        int startSeconds = convertToSeconds(Integer.parseInt(splitStart[0]),Integer.parseInt(splitStart[1]),Integer.parseInt(splitStart[2]));
+                        int endSeconds = convertToSeconds(Integer.parseInt(splitEnd[0]),Integer.parseInt(splitEnd[1]),Integer.parseInt(splitEnd[2]));
+                        int totalSeconds = endSeconds-startSeconds;
+
+                        switch(subType){
+                            case "communication":
+                                communicationCount += totalSeconds;
+                                break;
+
+                        }
+
+                        Log.d("Testing Application", subType.toString() + " start: " + subStart + " end: " + subEnd + " Seconds Spent: " + totalSeconds);
+                        break;
                 }
 
 
@@ -351,9 +396,9 @@ public class ApiConnector {
             Log.d(" CALI YESTER", aeeCount + "");
             Log.d(" API YESTER", stepsCount + "");
             if(isSpecYest == true){
-                cont.uploadSpeciYesteday(stepsCount,aeeCount);
+                cont.uploadSpeciYesteday(stepsCount,aeeCount,communicationCount);
             }else
-            cont.uploadYesterday(stepsCount,aeeCount);
+            cont.uploadYesterday(stepsCount,aeeCount,communicationCount);
        //     getToday();
 
         } catch (Exception e) {
@@ -409,6 +454,13 @@ public class ApiConnector {
 
     public void isFirstDay(boolean isit){
         isFirstDay = isit;
+    }
+
+    public int convertToSeconds(int hour, int minute, int seconds){
+        int toSeconds;
+        toSeconds = (hour*3600) + (minute*60) + seconds;
+
+        return toSeconds;
     }
 
 

@@ -34,7 +34,7 @@ public class Controller {
     private String birthday;
     private String headerVal;
     private String timeZ;
-    private int steps,calories,totalCals,totalSteps;
+    private int steps,calories,communication,totalCals,totalSteps,totalComm;
     private int fontColor;
     private int age,timer = 0;
     private long milisecondsMidnight;
@@ -88,6 +88,7 @@ public class Controller {
         Bundle info = new Bundle();
         info.putInt("steps",steps);
         info.putInt("calories",calories);
+        info.putInt("communication",communication);
         info.putString("user",userName);
         info.putDouble("height",height);
         info.putDouble("weight",weight);
@@ -155,6 +156,11 @@ public class Controller {
         Log.d("AEE IS", aee + "");
     }
 
+    public void setCommunication(int communication){
+        this.communication = communication;
+        Log.d("COM IS", communication + "");
+    }
+
     public void setBmr(Double bmr){
         this.bmr = bmr;
     }
@@ -191,9 +197,10 @@ public class Controller {
         //        calculateCharsAge();
                 calculateTotalSteps();
                 calculateTotalCals();
+                calculateTotalComm();
                 setParametersToLoad();
                 al.setSpineView(selectedView);
-                al.updateInfo(steps,calories);
+                al.updateInfo();
                 al.refreshComplete();
             }
         });
@@ -293,6 +300,7 @@ public class Controller {
     public void initiateChar(){
         calculateTotalCals();
         calculateTotalSteps();
+        calculateTotalComm();
         setCalToBeBurnt();
         setParametersToLoad();
     }
@@ -327,6 +335,11 @@ public class Controller {
         totalSteps = userCharacter.getTotalSteps() + steps;
     }
 
+    public void calculateTotalComm(){
+        Log.d("Total Comm: ", userCharacter.getCommunication() + " and " + communication);
+        totalComm = userCharacter.getCommunication() + communication;
+    }
+
     public int getCharacterAge(){
         return this.userCharacter.getAge();
     }
@@ -343,12 +356,37 @@ public class Controller {
         return this.totalSteps;
     }
 
+    public int getTotalComm(){
+        return this.totalComm;
+    }
+
     public int getTodaySteps(){
         return this.steps;
     }
 
     public int getTodayCals(){
         return  this.calories;
+    }
+
+    public int getTodayComm(){
+        return this.communication;
+    }
+
+
+    public String getTimeSpent(){
+        String toReturn;
+        int totalTime,minutes,seconds;
+        totalTime = userCharacter.getTimeSpent() + timer;
+        minutes = totalTime / 60;
+        seconds = totalTime - minutes * 60;
+
+        if(minutes == 0) {
+            toReturn = seconds + " seconds";
+
+        }else
+        toReturn = minutes + " minutes " + seconds + " seconds";
+
+        return toReturn;
     }
 
     public void setCalToBeBurnt(){
@@ -398,17 +436,18 @@ public class Controller {
 
     }
 
-    public void uploadYesterday(int ySteps, double yAee){
+    public void uploadYesterday(int ySteps, double yAee, int yComm){
         int yCals = (int) (yAee + (bmr * 24));
         Log.d("Uploading: " , yCals + " and " + ySteps);
-        db.uploadToDatabase(userName,yCals,ySteps);
+        db.uploadToDatabase(userName,yCals,ySteps,yComm);
      //   api.setWait(false);
     }
 
-    public void uploadSpeciYesteday(int ySteps, double yAee){
+    public void uploadSpeciYesteday(int ySteps, double yAee, int yComm){
         long hoursToUpload = 24 - (userCharacter.getBirthFromMidnight() / (1000*60*60));
         int yCals = (int) (yAee + (bmr * hoursToUpload));
-        db.uploadToDatabase(userName,yCals,ySteps);
+        db.uploadToDatabase(userName,yCals,ySteps,yComm);
+        Log.d("Uploaded Spec: " , yCals + " and hours " + hoursToUpload);
     }
 
     public String firstTimer(){
@@ -442,29 +481,110 @@ public class Controller {
     //TODO Determine which Spine animation to load on start and update
     // Determined by total calories burnt factor
     public void setParametersToLoad(){
+    //    int stepFactor = 50000;
+    //    int commFactor = 500;
+    //    boolean oneWeek = userCharacter.getAge() % 7 == 0;
+        int checkSize,checkMood,checkShoes,checkComm;
+
+        checkSize = determineSize();
+        checkMood = determineMood();
+
+        switch (checkSize){
+            //Normal
+            case 0:
+                switch(checkMood){
+                    case 0:
+                        //Happy
+                        Log.d("Test Mood", checkMood + "");
+                        break;
+
+                    case 1:
+                        //Sad
+                        break;
+                }
+                selectedView = SPINEVIEW.NORMAL;
+                break;
+            //Fat
+            case 1:
+                switch(checkMood){
+                    case 0:
+                        //Happy
+                        break;
+
+                    case 1:
+                        //Sad
+                        break;
+                }
+                selectedView = SPINEVIEW.NORMAL;
+                break;
+            //XXL
+            case 2:
+                switch(checkMood){
+                    case 0:
+                        //Happy
+                        break;
+
+                    case 1:
+                        //Sad
+                        break;
+                }
+                selectedView = SPINEVIEW.NORMAL;
+                break;
+        }
         Log.d(" PARA NULL" , totalCals + "  OR : " + toHaveBeenBurnt);
+
+    }
+
+    public int determineSize(){
+        int calorieFactor = (int) (bmr*3);
         int calDiff = (int) (totalCals - toHaveBeenBurnt);
-        selectedView = SPINEVIEW.NORMAL;
 
-        if(calDiff <= 200 || -200 <= calDiff){
+        if(calDiff <= calorieFactor || -calorieFactor <= calDiff){
             fontColor = Color.YELLOW;
+            return 0;
         }
 
-        if(calDiff > 200){
+        if(calDiff > calorieFactor){
             fontColor = Color.GREEN;
+            return 1;
         }
 
-        if(calDiff < -200){
+        if(calDiff < -calorieFactor){
             fontColor = Color.RED;
+            return 2;
         }
+
+        return 0;
+    }
+
+    public int determineMood(){
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+        int timeShouldSpent = (int) (((userCharacter.getAge()) * 480) + (hoursSinceMidnight * 20) - (fromMidnight * 20));
+
+
+        Log.d("Time Shoud Spent: " + timeShouldSpent, " Time have Spent: " + userCharacter.getTimeSpent() +" Time: " + timer);
+
+        if(timeShouldSpent<userCharacter.getTimeSpent()+timer){
+            return 0;
+        }else{
+            return 1;
+        }
+
     }
 
     public void stopTimer(){
         tTime.stopTimer();
+        db.updateTimeSpent(userCharacter.getUsername(),timer);
     }
 
     public void resumeTimer(){
         tTime.resumeTimer();
+        timer = 0;
         tTime.start();
     }
 

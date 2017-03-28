@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.examen.aloglife.normal.NormalHappy;
+import com.examen.aloglife.normal.NormalSad;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,7 +32,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
 	private Button stepsBtn,calBtn,ageBtn,comBtn,intBtn;
 	private TextView infoTextview;
-	private int stepsToday, caloriesToday;
+	private int stepsToday, caloriesToday,communicationToday;
 	private int timer,fontColor;
 	private Double bmr,weight,height;
 	private Controller cont;
@@ -38,7 +40,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private SwipeRefreshLayout swipeContainer;
 	private AndroidApplicationConfiguration config;
 	private Controller.SPINEVIEW selectedView;
-	private boolean ageIs = false,stepsIs = false,calIs = false;
+	private boolean ageIs = false,stepsIs = false,calIs = false, commIs = false;
 	private float centerX,centerY,screenH,screenW;
 	private AndroidApplicationConfiguration cfg;
 	private boolean isPause = false;
@@ -106,7 +108,7 @@ public class AndroidLauncher extends AndroidApplication {
 
 		switch(selectedView){
 			case NORMAL:
-				Normal normal = new Normal(centerX,centerY);
+				NormalHappy normal = new NormalHappy(centerX,centerY);
 				spineView.addView(initializeForView(normal,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
@@ -148,6 +150,7 @@ public class AndroidLauncher extends AndroidApplication {
 		calBtn.setTextColor(fontColor);
 		stepsBtn.setText("Steps: " + cont.getTodaySteps());
 		calBtn.setText("Cal Burnt: " + cont.getTodayCals());
+		comBtn.setText("Com: " + cont.getTodayComm());
 		ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 		infoTextview.setText("Character for account: " + userName);
 	}
@@ -161,6 +164,7 @@ public class AndroidLauncher extends AndroidApplication {
 		cont.setupUpdate(authCode,refToken,header);
 		cont.setSteps(stepsToday);
 		cont.setBurntCalories(caloriesToday);
+		cont.setCommunication(communicationToday);
 		cont.setBmr(bmr);
 		cont.initiateChar();
 	}
@@ -169,6 +173,7 @@ public class AndroidLauncher extends AndroidApplication {
 		selectedView = (Controller.SPINEVIEW) getIntent().getSerializableExtra("view");
 		stepsToday = getIntent().getExtras().getInt("steps");
 		caloriesToday = getIntent().getExtras().getInt("calories");
+		communicationToday = getIntent().getExtras().getInt("communication");
 		authCode = getIntent().getExtras().getString("auth");
 		refToken = getIntent().getExtras().getString("ref");
 		header = getIntent().getExtras().getString("header");
@@ -181,20 +186,18 @@ public class AndroidLauncher extends AndroidApplication {
 	//	Log.d("Extract from intent", stepsToday + "  " + "/// " + header);
 	}
 
-	public void updateInfo(int stepsTotal, int calories){
-		this.stepsToday = stepsTotal;
-		this.caloriesToday = calories;
+	public void updateInfo(){
 
 		Log.d("Refresh status is: " , stepsIs + "" + calIs + ageIs + " COLOR FONT NOW" + cont.getFontColor());
 		calBtn.setTextColor(cont.getFontColor());
 
 		if(stepsIs == false){
-			stepsBtn.setText("Steps: " + stepsToday);
+			stepsBtn.setText("Steps: " + cont.getTodaySteps());
 		}else {
 			stepsBtn.setText("Total Steps: " + cont.getTotalSteps());
 		}
 		if(calIs == false) {
-			calBtn.setText("Cal Burnt: " + calories);
+			calBtn.setText("Cal Burnt: " + cont.getTodayCals());
 			infoTextview.setText("Have Burnt/Need to burn: " + cont.getTotalCals() + " / " + cont.getToHaveBurntCal() + " cal");
 		}else {
 			calBtn.setText("Total Cals: " + cont.getTotalCals());
@@ -204,6 +207,12 @@ public class AndroidLauncher extends AndroidApplication {
 			ageBtn.setText("Char is: " + cont.getCharacterAge() + " days");
 		}else {
 			ageBtn.setText("Born: " + cont.getCharacterBirth());
+		}
+
+		if(commIs == false) {
+			comBtn.setText("Com: " + cont.getTodayComm());
+		}else {
+			comBtn.setText("Com Total: " + cont.getTotalComm());
 		}
 
 	}
@@ -239,6 +248,12 @@ public class AndroidLauncher extends AndroidApplication {
 		boogieView = (RelativeLayout) findViewById(R.id.boogieViewID);
 		returnBtn = (Button) findViewById(R.id.returnBtnID);
 		returnBtn.setOnClickListener(new OnRtnClick());
+
+		infoName.setText("Created for account: " + userName);
+		infoBirth.setText("Character birth on: " + birthday + "\t \t Character is: " + cont.getCharacterAge() + " old");
+		infoCal.setText("Today you have burnt: " + cont.getTodayCals() + "\t \t Total you have burnt: " + cont.getTotalCals());
+		infoStep.setText("Today you have walked: " + cont.getTodaySteps() + " steps \t \t Total you have walked: " + cont.getTotalSteps());
+		infoCom.setText("You have spent: " + cont.getTimeSpent() + " with Boogie");
 
 		BoggiFat idleFat = new BoggiFat(centerX,centerY);
 		boogieView.addView(initializeForView(idleFat,cfg));

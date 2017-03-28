@@ -1,0 +1,36 @@
+{
+    "animations": {
+        "animtion0": {
+            "bones": {
+                "root": {
+                    "translate": [{
+                        "y": 0,
+                        "time": 0,
+                        "x": 0
+                    }],
+                    "scale": [{
+                        "y": 1,
+                        "time": 0,
+                        "x": 1
+                    }],
+                    "rotate": [{
+                        "time": 0,
+                        "angle": 0
+                    }]
+                }
+            }
+        }
+    },
+    "ik": [],
+    "skins": {},
+    "bones": [{
+        "name": "root",
+        "length": 0
+    }],
+    "skeleton": {
+        "spine": "3.3.07",
+        "images": "./image/"
+    },
+    "slots": [],
+    "events": {}
+}
