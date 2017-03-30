@@ -76,7 +76,16 @@ public class NormalHappyShoes extends ApplicationAdapter{
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-        state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
+        state.setTimeScale(1f); // Slow all animations down to 60% speed.
+
+        stateData.setMix("Idle", "jump", 0.2f);
+        stateData.setMix("jump", "Idle", 0.2f);
+        stateData.setMix("Idle", "wave", 0.2f);
+        stateData.setMix("wave", "Idle", 0.2f);
+        stateData.setMix("Idle", "walk", 0.2f);
+        stateData.setMix("walk", "Idle", 0.2f);
+        stateData.setMix("Idle", "lookatshoes", 0.2f);
+        stateData.setMix("lookatshoes", "Idle", 0.2f);
 
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "Idle", true);
@@ -194,7 +203,7 @@ public class NormalHappyShoes extends ApplicationAdapter{
 
 
                         if(isFlip == false){
-                            for (float i = centerX; i > centerX-180 ; i = i - 4) {
+                            for (float i = centerX; i > centerX-165 ; i = i - 4) {
                                 skeleton.setX(i);
                                 try {
                                     Thread.sleep(100);
@@ -204,7 +213,7 @@ public class NormalHappyShoes extends ApplicationAdapter{
                             }
                             centerX = centerX - 180;
                         }else {
-                            for (float i = centerX; i < centerX+180 ; i = i + 4) {
+                            for (float i = centerX; i < centerX+165 ; i = i + 4) {
                                 skeleton.setX(i);
                                 try {
                                     Thread.sleep(100);

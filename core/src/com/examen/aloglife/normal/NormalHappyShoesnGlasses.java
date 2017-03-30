@@ -62,7 +62,7 @@ public class NormalHappyShoesnGlasses extends ApplicationAdapter {
 
         atlas = new TextureAtlas(Gdx.files.internal("normal/normalHappyShoesnGlasses/boggiNormalShoesnGlasses_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-        json.setScale(1f); // Load the skeleton at 50% the size it was in Spine.
+        json.setScale(1.4f); // Load the skeleton at 50% the size it was in Spine.
         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalHappyShoesnGlasses/boggiNormalShoesnGlasses.json"));
 
 
@@ -76,7 +76,18 @@ public class NormalHappyShoesnGlasses extends ApplicationAdapter {
         AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 
         state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-        state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
+        state.setTimeScale(1f); // Slow all animations down to 60% speed.
+
+        stateData.setMix("Idle", "jump", 0.2f);
+        stateData.setMix("jump", "Idle", 0.2f);
+        stateData.setMix("Idle", "wave", 0.2f);
+        stateData.setMix("wave", "Idle", 0.2f);
+        stateData.setMix("Idle", "walk", 0.2f);
+        stateData.setMix("walk", "Idle", 0.2f);
+        stateData.setMix("Idle", "lookatshoes", 0.2f);
+        stateData.setMix("lookatshoes", "Idle", 0.2f);
+        stateData.setMix("Idle", "idle_glasses", 0.2f);
+        stateData.setMix("idle_glasses", "Idle", 0.2f);
 
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "Idle", true);
@@ -194,7 +205,7 @@ public class NormalHappyShoesnGlasses extends ApplicationAdapter {
 
 
                         if(isFlip == false){
-                            for (float i = centerX; i > centerX-180 ; i = i - 4) {
+                            for (float i = centerX; i > centerX-165 ; i = i - 4) {
                                 skeleton.setX(i);
                                 try {
                                     Thread.sleep(100);
@@ -204,7 +215,7 @@ public class NormalHappyShoesnGlasses extends ApplicationAdapter {
                             }
                             centerX = centerX - 180;
                         }else {
-                            for (float i = centerX; i < centerX+180 ; i = i + 4) {
+                            for (float i = centerX; i < centerX+165 ; i = i + 4) {
                                 skeleton.setX(i);
                                 try {
                                     Thread.sleep(100);

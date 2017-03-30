@@ -258,7 +258,7 @@ public class ApiConnector {
     }
 
     public void extractActivity(String activityInfo){
-        int stepsCount = 0, communicationCount = 0;
+        int stepsCount = 0, communicationCount = 0, browsingCount = 0;
         Double aeeCount = 0.00;
         String type;
 
@@ -306,6 +306,9 @@ public class ApiConnector {
                                 communicationCount += totalSeconds;
                                 break;
 
+                            case "browsing":
+                                browsingCount += totalSeconds;
+                                break;
                         }
 
                         Log.d("Testing Application", subType.toString() + " start: " + subStart + " end: " + subEnd + " Seconds Spent: " + totalSeconds);
@@ -315,6 +318,7 @@ public class ApiConnector {
                 cont.setSteps(stepsCount);
                 cont.setAee(aeeCount);
                 cont.setCommunication(communicationCount);
+                cont.setBrowsing(browsingCount);
                 cont.calcCalories();
          //       cont.setParametersToLoad();
 
@@ -343,7 +347,7 @@ public class ApiConnector {
     }
 
     public void extractYesterday(String yesterdayInfo){
-        int stepsCount = 0, communicationCount = 0;
+        int stepsCount = 0, communicationCount = 0, browsingCount = 0;
         Double aeeCount = 0.00;
         String type;
         try {
@@ -385,6 +389,10 @@ public class ApiConnector {
                                 communicationCount += totalSeconds;
                                 break;
 
+                            case "browsing":
+                                browsingCount += totalSeconds;
+                                break;
+
                         }
 
                         Log.d("Testing Application", subType.toString() + " start: " + subStart + " end: " + subEnd + " Seconds Spent: " + totalSeconds);
@@ -396,9 +404,9 @@ public class ApiConnector {
             Log.d(" CALI YESTER", aeeCount + "");
             Log.d(" API YESTER", stepsCount + "");
             if(isSpecYest == true){
-                cont.uploadSpeciYesteday(stepsCount,aeeCount,communicationCount);
+                cont.uploadSpeciYesteday(stepsCount,aeeCount,communicationCount,browsingCount);
             }else
-            cont.uploadYesterday(stepsCount,aeeCount,communicationCount);
+            cont.uploadYesterday(stepsCount,aeeCount,communicationCount,browsingCount);
        //     getToday();
 
         } catch (Exception e) {

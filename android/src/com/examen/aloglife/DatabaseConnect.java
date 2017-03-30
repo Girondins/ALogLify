@@ -24,11 +24,12 @@ public class DatabaseConnect extends SQLiteOpenHelper {
     private static final String COLUMN_FIRSTDAY = "firstday";
     private static final String COLUMN_TIMESPENT = "timespent";
     private static final String COLUMN_COMMUNICATION = "communication";
+    private static final String COLUMN_BROWSING = "browsing";
 
 
 
     private static final String DATABASE_NAME = "aloglife.db";
-    private static final int DATABASE_VERSION = 28;
+    private static final int DATABASE_VERSION = 30;
     private static final String DATABASE_CREATE_CHAR = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +
@@ -38,6 +39,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
             COLUMN_FIRSTDAY + " integer , " +
             COLUMN_TIMESPENT + " integer , " +
             COLUMN_COMMUNICATION + " integer , " +
+            COLUMN_BROWSING + " integer , " +
             COLUMN_CALORIES + " integer , " +
             COLUMN_STEPS + " integer);";
 
@@ -96,11 +98,11 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         values.put(DatabaseConnect.COLUMN_TIMESPENT,0);
         db.insert(DatabaseConnect.TABLE_CHAR,"",values);
         Log.d("Creating: ", username + " Born: " + dayofbirth + " Midnight: " + midnightHours);
-        return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth,timezone,0,0,0);
+        return new Character(username,dayofbirth,0,0,midnightHours,dayofbirth,timezone,0,0,0,0);
     }
 
     public Character getCharacter(String username){
-        int cal,steps,birth,lastlogin,midnight,timezone,firstday,timeSpent,communication;
+        int cal,steps,birth,lastlogin,midnight,timezone,firstday,timeSpent,communication,browsing;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConnect.TABLE_CHAR + " WHERE " + DatabaseConnect.COLUMN_ID + "= ?" , new String[]{username});
         cal = cursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
@@ -112,10 +114,11 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         firstday = cursor.getColumnIndex(DatabaseConnect.COLUMN_FIRSTDAY);
         timeSpent = cursor.getColumnIndex(DatabaseConnect.COLUMN_TIMESPENT);
         communication = cursor.getColumnIndex(DatabaseConnect.COLUMN_COMMUNICATION);
+        browsing = cursor.getColumnIndex(DatabaseConnect.COLUMN_BROWSING);
 
         for(int i=0; i<cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getLong(midnight),cursor.getString(lastlogin),cursor.getString(timezone),cursor.getInt(firstday),cursor.getInt(timeSpent),cursor.getInt(communication));
+            Character userCharacter = new Character(username,cursor.getString(birth),cursor.getInt(cal),cursor.getInt(steps),cursor.getLong(midnight),cursor.getString(lastlogin),cursor.getString(timezone),cursor.getInt(firstday),cursor.getInt(timeSpent),cursor.getInt(communication),cursor.getInt(browsing));
             Log.d(" GETTING CHAR : ", username + " Born: " + userCharacter.getDayofbirth() + " Midnight: " + userCharacter.getBirthFromMidnight() + " STEPS:  " + userCharacter.getTotalSteps() + "TIME ZONE: " + userCharacter.getBirthTimeZone() + "FIRSTDAY : " + userCharacter.getFirstday() + " TIME SPENT: " + userCharacter.getTimeSpent());
             return userCharacter;
         }
@@ -171,9 +174,9 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
     }
 
-    public void uploadToDatabase(String username,int yCals, int ySteps, int yComm){
-        int cal,steps,comm,upCals,upSteps,upComm
-                ,dbCals=0,dbSteps=0,dbComm=0;
+    public void uploadToDatabase(String username,int yCals, int ySteps, int yComm, int yBrow){
+        int cal,steps,comm,brow,upCals,upSteps,upComm,upBrow
+                ,dbCals=0,dbSteps=0,dbComm=0,dbBrow=0;
 
         SQLiteDatabase readDb = getReadableDatabase();
         SQLiteDatabase writeDb = getWritableDatabase();
@@ -181,12 +184,14 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         cal = readCursor.getColumnIndex(DatabaseConnect.COLUMN_CALORIES);
         steps = readCursor.getColumnIndex(DatabaseConnect.COLUMN_STEPS);
         comm = readCursor.getColumnIndex(DatabaseConnect.COLUMN_COMMUNICATION);
+        brow = readCursor.getColumnIndex(DatabaseConnect.COLUMN_BROWSING);
 
         for(int i=0; i<readCursor.getCount(); i++){
             readCursor.moveToPosition(i);
             dbCals = readCursor.getInt(cal);
             dbSteps = readCursor.getInt(steps);
             dbComm = readCursor.getInt(comm);
+            dbBrow = readCursor.getInt(brow);
         }
 
         Log.d("DB Steps: ", dbSteps + "" );
@@ -194,8 +199,9 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         upCals = dbCals + yCals;
         upSteps = dbSteps + ySteps;
         upComm = dbComm + yComm;
+        upBrow = dbBrow + yBrow;
 
-        Log.d("TOTAL STEPS FROM DB: ", upSteps + " Comm: " + upComm);
+        Log.d("TOTAL STEPS FROM DB: ", upSteps + " Comm: " + upComm + " Brow: " + upBrow);
 
         Cursor stepCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
                 DatabaseConnect.COLUMN_STEPS + "=" + upSteps + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
@@ -206,13 +212,18 @@ public class DatabaseConnect extends SQLiteOpenHelper {
         Cursor commCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
                 DatabaseConnect.COLUMN_COMMUNICATION + "=" + upComm + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
 
+        Cursor browCurs = writeDb.rawQuery("UPDATE " + DatabaseConnect.TABLE_CHAR + " SET " +
+                DatabaseConnect.COLUMN_BROWSING + "=" + upBrow + " WHERE " + DatabaseConnect.COLUMN_ID + "=?",new String[]{username});
+
 
         stepCurs.moveToFirst();
         calCurs.moveToFirst();
         commCurs.moveToFirst();
+        browCurs.moveToFirst();
         stepCurs.close();
         calCurs.close();
         commCurs.close();
+        browCurs.close();
 
     }
 

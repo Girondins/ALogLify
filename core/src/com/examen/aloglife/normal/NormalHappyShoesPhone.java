@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
-import com.examen.aloglife.Fat;
 
 import java.util.Random;
 import java.util.Timer;
@@ -25,10 +24,10 @@ import spine.SkeletonMeshRenderer;
 import spine.SkeletonRendererDebug;
 
 /**
- * Created by Girondins on 2017-03-28.
+ * Created by Girondins on 2017-03-30.
  */
 
-public class NormalHappy extends ApplicationAdapter{
+public class NormalHappyShoesPhone extends ApplicationAdapter{
 
 
     OrthographicCamera camera;
@@ -45,7 +44,7 @@ public class NormalHappy extends ApplicationAdapter{
 
     private float centerX,centerY;
 
-    public NormalHappy(float centerX, float centerY){
+    public NormalHappyShoesPhone(float centerX, float centerY){
         this.centerX = centerX;
         this.centerY = centerY;
         System.out.println("Ceneter is " + centerX);
@@ -61,10 +60,10 @@ public class NormalHappy extends ApplicationAdapter{
         debugRenderer.setRegionAttachments(false);
         debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("normal/normalHappy/boggi_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("normal/normalHappyShoePhone/boggiNormalshoesandphone_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(1.4f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalHappy/boggi.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalHappyShoePhone/boggiNormalshoesandphone.json"));
 
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
@@ -85,6 +84,10 @@ public class NormalHappy extends ApplicationAdapter{
         stateData.setMix("wave", "Idle", 0.2f);
         stateData.setMix("Idle", "walk", 0.2f);
         stateData.setMix("walk", "Idle", 0.2f);
+        stateData.setMix("Idle", "lookatshoes", 0.2f);
+        stateData.setMix("lookatshoes", "Idle", 0.2f);
+        stateData.setMix("Idle", "Lookatphone", 0.2f);
+        stateData.setMix("Lookatphone", "Idle", 0.2f);
 
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "Idle", true);
@@ -99,7 +102,7 @@ public class NormalHappy extends ApplicationAdapter{
         loggiSkel  = new Skeleton(skeletonDataLog);
         loggiSkel.setPosition(150,350);
 
-        timer.schedule(new NormalHappy.Animater(),2000);
+        timer.schedule(new NormalHappyShoesPhone.Animater(),2000);
 
         // Keys in higher tracks override the pose from lower tracks.
         Gdx.input.setInputProcessor(new InputAdapter() {
@@ -155,7 +158,7 @@ public class NormalHappy extends ApplicationAdapter{
         renderer.draw(batch, skeleton); // Draw the skeleton images.
         batch.end();
 
-     //   debugRenderer.draw(skeleton); // Draw debug lines.
+        //   debugRenderer.draw(skeleton); // Draw debug lines.
     }
 
     public void resize (int width, int height) {
@@ -225,15 +228,22 @@ public class NormalHappy extends ApplicationAdapter{
                         }
                         state.addAnimation(0, "Idle", true, 0);
                         break;
+                    case 2:
+                        state.setAnimation(0, "lookatshoes", false);
+                        state.addAnimation(0, "Idle", true, 0);
+                        break;
+                    case 3:
+                        state.setAnimation(0, "Lookatphone", false);
+                        state.addAnimation(0, "Idle", true, 0);
+
                 }
                 try {
                     Thread.sleep(sleepDuration);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                task = rand.nextInt(2);
+                task = rand.nextInt(4);
             }
         }
     }
-
 }

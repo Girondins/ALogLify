@@ -22,9 +22,15 @@ import android.widget.Toast;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.examen.aloglife.normal.NormalHappy;
+import com.examen.aloglife.normal.NormalHappyGSP;
+import com.examen.aloglife.normal.NormalHappyGlasses;
+import com.examen.aloglife.normal.NormalHappyPhone;
+import com.examen.aloglife.normal.NormalHappyPhoneGlasses;
 import com.examen.aloglife.normal.NormalHappyShoes;
+import com.examen.aloglife.normal.NormalHappyShoesPhone;
 import com.examen.aloglife.normal.NormalHappyShoesnGlasses;
 import com.examen.aloglife.normal.NormalSad;
+import com.examen.aloglife.normal.NormalSadGlasses;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,7 +39,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
 	private Button stepsBtn,calBtn,ageBtn,comBtn,intBtn;
 	private TextView infoTextview;
-	private int stepsToday, caloriesToday,communicationToday;
+	private int stepsToday, caloriesToday,communicationToday,browsingToday;
 	private int timer,fontColor;
 	private Double bmr,weight,height;
 	private Controller cont;
@@ -108,8 +114,39 @@ public class AndroidLauncher extends AndroidApplication {
 
 	public void initiateSpineView(){
 		spineView.removeAllViews();
+		boolean happy = cont.getMood();
+		int size = cont.getIsSize();
+
+		switch(size){
+			case 0:
+				if(happy == true){
+					setNormalHappy();
+				}else{
+					setNormalSad();
+				}
+				break;
+			case 1:
+				if(happy == true){
+					setFatHappy();
+				}else{
+					setFatSad();
+				}
+				break;
+			case 2:
+				if(happy == true){
+					setXXLHappy();
+				}else{
+					setXXLSad();
+				}
+				break;
+		}
+
+	}
+
+	public void setNormalHappy(){
 
 		switch(selectedView){
+
 			case NORMALHAPPY:
 				NormalHappy normalhappy = new NormalHappy(centerX,centerY);
 				spineView.addView(initializeForView(normalhappy,cfg));
@@ -119,9 +156,40 @@ public class AndroidLauncher extends AndroidApplication {
 					glView.setZOrderOnTop(true);
 				}
 				break;
-			case NORMALSAD:
-				NormalSad normalsad = new NormalSad(centerX,centerY);
-				spineView.addView(initializeForView(normalsad,cfg));
+
+			case NORMALHAPPYGLASSES:
+				NormalHappyGlasses normalHappyGlasses = new NormalHappyGlasses(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyGlasses,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+			case NORMALHAPPYGSP:
+				NormalHappyGSP normalHappyGSP = new NormalHappyGSP(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyGSP,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+			case NORMALHAPPYPHONE:
+				NormalHappyPhone normalHappyPhone = new NormalHappyPhone(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyPhone,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+			case NORMALHAPPYPHONENGLASSES:
+				NormalHappyPhoneGlasses normalHappyPhoneGlasses = new NormalHappyPhoneGlasses(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyPhoneGlasses,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
 					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
@@ -138,6 +206,7 @@ public class AndroidLauncher extends AndroidApplication {
 					glView.setZOrderOnTop(true);
 				}
 				break;
+
 			case NORMALHAPPYSHOESNGLASSES:
 				NormalHappyShoesnGlasses normalHappyShoesnGlasses = new NormalHappyShoesnGlasses(centerX,centerY);
 				spineView.addView(initializeForView(normalHappyShoesnGlasses,cfg));
@@ -148,53 +217,52 @@ public class AndroidLauncher extends AndroidApplication {
 				}
 				break;
 
+			case NORMALHAPPYSHOESNPHONE:
+				NormalHappyShoesPhone normalHappyShoesPhone = new NormalHappyShoesPhone(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyShoesPhone,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+			//TRAIN MISSING
 		}
+
+	}
+
+	public void setNormalSad(){
+
+	}
+
+	public void setFatHappy(){
+
+	}
+
+	public void setFatSad(){
+
+	}
+
+	public void setXXLHappy(){
+
+	}
+
+	public void setXXLSad(){
 
 	}
 
 	public void initiateBoogieView(){
 		spineView.removeAllViews();
 
-		switch(selectedView){
-			case NORMALHAPPY:
-				NormalHappy normalhappy = new NormalHappy(centerX,centerY);
+				NormalHappyShoesPhone normalhappy = new NormalHappyShoesPhone(centerX,centerY);
 				boogieView.addView(initializeForView(normalhappy,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
 					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 					glView.setZOrderOnTop(true);
 				}
-				break;
-			case NORMALSAD:
-				NormalSad normalsad = new NormalSad(centerX,centerY);
-				boogieView.addView(initializeForView(normalsad,cfg));
-				if (graphics.getView() instanceof SurfaceView) {
-					SurfaceView glView = (SurfaceView) graphics.getView();
-					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-					glView.setZOrderOnTop(true);
-				}
-				break;
 
-			case NORMALHAPPYSHOES:
-				NormalHappyShoes normalhappyshoes = new NormalHappyShoes(centerX,centerY);
-				boogieView.addView(initializeForView(normalhappyshoes,cfg));
-				if (graphics.getView() instanceof SurfaceView) {
-					SurfaceView glView = (SurfaceView) graphics.getView();
-					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-					glView.setZOrderOnTop(true);
-				}
-				break;
-			case NORMALHAPPYSHOESNGLASSES:
-				NormalHappyShoesnGlasses normalHappyShoesnGlasses = new NormalHappyShoesnGlasses(centerX,centerY);
-				boogieView.addView(initializeForView(normalHappyShoesnGlasses,cfg));
-				if (graphics.getView() instanceof SurfaceView) {
-					SurfaceView glView = (SurfaceView) graphics.getView();
-					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-					glView.setZOrderOnTop(true);
-				}
-				break;
-
-		}
 
 	}
 
@@ -234,6 +302,7 @@ public class AndroidLauncher extends AndroidApplication {
 		cont.setSteps(stepsToday);
 		cont.setBurntCalories(caloriesToday);
 		cont.setCommunication(communicationToday);
+		cont.setBrowsing(browsingToday);
 		cont.setBmr(bmr);
 		cont.initiateChar();
 	}
@@ -243,6 +312,7 @@ public class AndroidLauncher extends AndroidApplication {
 		stepsToday = getIntent().getExtras().getInt("steps");
 		caloriesToday = getIntent().getExtras().getInt("calories");
 		communicationToday = getIntent().getExtras().getInt("communication");
+		browsingToday = getIntent().getExtras().getInt("browsing");
 		authCode = getIntent().getExtras().getString("auth");
 		refToken = getIntent().getExtras().getString("ref");
 		header = getIntent().getExtras().getString("header");
@@ -342,13 +412,6 @@ public class AndroidLauncher extends AndroidApplication {
 		bikeBtn.setOnClickListener(new OnNotImpClick());
 		cameraBtn.setOnClickListener(new OnNotImpClick());
 
-		String[] infoList = {"Created for account: " + userName, "Character birth on: " + birthday + "\nCharacter is: " + cont.getCharacterAge() + " old",
-										"Today you have burnt: " + cont.getTodayCals() + "\nTotal you have burnt: " + cont.getTotalCals(),
-								"Today you have walked: " + cont.getTodaySteps() + " steps \nTotal you have walked: " + cont.getTotalSteps() + " steps",
-								"You have communicated today for: " + cont.getCommTimeToday() + "\nTotal you have communicated for: " + cont.getCommTimeTotal(),
-								"You have spent: " + cont.getTimeSpent() + " with Boogie"};
-
-	//	infoListView.setAdapter(new ListViewAdapter(this,infoList));
 
 
 
@@ -481,7 +544,7 @@ public class AndroidLauncher extends AndroidApplication {
 		public void onClick(View view) {
 
 			if(infoToView == 0){
-				infoToView = 3;
+				infoToView = 4;
 			}else
 				infoToView --;
 
@@ -531,6 +594,16 @@ public class AndroidLauncher extends AndroidApplication {
 					avgSumView.setText(cont.getAvgComm());
 					break;
 
+				case 4:
+					headerView.setText("Browsing");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getBrowTimeToday());
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getBrowTimeTotal());
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgComm());
+					break;
+
 			}
 
 		}
@@ -540,7 +613,7 @@ public class AndroidLauncher extends AndroidApplication {
 		@Override
 		public void onClick(View view) {
 
-			if(infoToView == 3){
+			if(infoToView == 4){
 				infoToView = 0;
 			}else
 			infoToView ++;
@@ -583,6 +656,16 @@ public class AndroidLauncher extends AndroidApplication {
 					todaySumView.setText(cont.getCommTimeToday());
 					totalTextView.setText("Total: ");
 					totalSumView.setText(cont.getCommTimeTotal());
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgComm());
+					break;
+
+				case 4:
+					headerView.setText("Browsing");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getBrowTimeToday());
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getBrowTimeTotal());
 					avgView.setText("Average: ");
 					avgSumView.setText(cont.getAvgComm());
 					break;
