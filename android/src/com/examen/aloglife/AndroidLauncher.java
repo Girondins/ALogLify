@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,12 +22,12 @@ import android.widget.Toast;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.examen.aloglife.normal.NormalHappy;
+import com.examen.aloglife.normal.NormalHappyShoes;
+import com.examen.aloglife.normal.NormalHappyShoesnGlasses;
 import com.examen.aloglife.normal.NormalSad;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.examen.aloglife.Controller.SPINEVIEW.NORMAL;
 
 public class AndroidLauncher extends AndroidApplication {
 	private RelativeLayout spineView;
@@ -45,12 +46,14 @@ public class AndroidLauncher extends AndroidApplication {
 	private AndroidApplicationConfiguration cfg;
 	private boolean isPause = false;
 	private LinearLayout starView,infoView;
+	private ListView infoListView;
+	private int infoToView = 0;
 
 
 	//For InfoView
-	private TextView infoBirth,infoName,infoCal,infoStep,infoCom;
+	private TextView todayTextView,totalTextView,todaySumView,totalSumView,headerView,avgView,avgSumView;
 	private RelativeLayout boogieView;
-	private Button returnBtn;
+	private Button returnBtn,shoeBtn,glassesBtn,bikeBtn,cameraBtn,prevBtn,nextBtn;
 
 
 
@@ -107,24 +110,90 @@ public class AndroidLauncher extends AndroidApplication {
 		spineView.removeAllViews();
 
 		switch(selectedView){
-			case NORMAL:
-				NormalHappy normal = new NormalHappy(centerX,centerY);
-				spineView.addView(initializeForView(normal,cfg));
+			case NORMALHAPPY:
+				NormalHappy normalhappy = new NormalHappy(centerX,centerY);
+				spineView.addView(initializeForView(normalhappy,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
 					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 					glView.setZOrderOnTop(true);
 				}
 				break;
-			case FAT:
-				BoggiFat idleFat = new BoggiFat(centerX,centerY);
-				spineView.addView(initializeForView(idleFat,cfg));
+			case NORMALSAD:
+				NormalSad normalsad = new NormalSad(centerX,centerY);
+				spineView.addView(initializeForView(normalsad,cfg));
 				if (graphics.getView() instanceof SurfaceView) {
 					SurfaceView glView = (SurfaceView) graphics.getView();
 					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 					glView.setZOrderOnTop(true);
 				}
 				break;
+
+			case NORMALHAPPYSHOES:
+				NormalHappyShoes normalhappyshoes = new NormalHappyShoes(centerX,centerY);
+				spineView.addView(initializeForView(normalhappyshoes,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+			case NORMALHAPPYSHOESNGLASSES:
+				NormalHappyShoesnGlasses normalHappyShoesnGlasses = new NormalHappyShoesnGlasses(centerX,centerY);
+				spineView.addView(initializeForView(normalHappyShoesnGlasses,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+		}
+
+	}
+
+	public void initiateBoogieView(){
+		spineView.removeAllViews();
+
+		switch(selectedView){
+			case NORMALHAPPY:
+				NormalHappy normalhappy = new NormalHappy(centerX,centerY);
+				boogieView.addView(initializeForView(normalhappy,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+			case NORMALSAD:
+				NormalSad normalsad = new NormalSad(centerX,centerY);
+				boogieView.addView(initializeForView(normalsad,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
+			case NORMALHAPPYSHOES:
+				NormalHappyShoes normalhappyshoes = new NormalHappyShoes(centerX,centerY);
+				boogieView.addView(initializeForView(normalhappyshoes,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+			case NORMALHAPPYSHOESNGLASSES:
+				NormalHappyShoesnGlasses normalHappyShoesnGlasses = new NormalHappyShoesnGlasses(centerX,centerY);
+				boogieView.addView(initializeForView(normalHappyShoesnGlasses,cfg));
+				if (graphics.getView() instanceof SurfaceView) {
+					SurfaceView glView = (SurfaceView) graphics.getView();
+					glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+					glView.setZOrderOnTop(true);
+				}
+				break;
+
 		}
 
 	}
@@ -240,28 +309,51 @@ public class AndroidLauncher extends AndroidApplication {
 	}
 
 	public void initiateInfoViewComp(){
-		infoBirth = (TextView) findViewById(R.id.textInfoBirth);
-		infoName = (TextView) findViewById(R.id.textInfoName);
-		infoCal = (TextView) findViewById(R.id.textInfoCalories);
-		infoStep = (TextView) findViewById(R.id.textInfoSteps);
-		infoCom = (TextView) findViewById(R.id.textInfoComm);
+	//	infoListView = (ListView) findViewById(R.id.listViewID);
 		boogieView = (RelativeLayout) findViewById(R.id.boogieViewID);
 		returnBtn = (Button) findViewById(R.id.returnBtnID);
+		prevBtn = (Button) findViewById(R.id.prevBtnID);
+		nextBtn = (Button) findViewById(R.id.nextBtnID);
+		shoeBtn = (Button) findViewById(R.id.shoesBtnID);
+		glassesBtn = (Button) findViewById(R.id.glassesBtnID);
+		bikeBtn = (Button) findViewById(R.id.bikeBtnID);
+		cameraBtn = (Button) findViewById(R.id.cameraBtnID);
+		totalTextView = (TextView) findViewById(R.id.overViewTotalID);
+		todayTextView = (TextView) findViewById(R.id.overViewTodayID);
+		todaySumView = (TextView) findViewById(R.id.overViewTodaySumID);
+		totalSumView = (TextView) findViewById(R.id.overViewTotalSumID);
+		headerView = (TextView) findViewById(R.id.overViewHeaderID);
+		avgView = (TextView) findViewById(R.id.overViewAvgID);
+		avgSumView = (TextView) findViewById(R.id.overViewAvgSumID);
+
+		headerView.setText("Boogie");
+		todayTextView.setText("Born: ");
+		todaySumView.setText(cont.getCharacterBirth());
+		totalTextView.setText("Age: ");
+		totalSumView.setText(cont.getCharacterAge() + " days");
+		avgView.setText("Time with Boogie: ");
+		avgSumView.setText(cont.getTimeSpent());
+
+		nextBtn.setOnClickListener(new OnNextClick());
+		prevBtn.setOnClickListener(new OnPrevClick());
 		returnBtn.setOnClickListener(new OnRtnClick());
+		shoeBtn.setOnClickListener(new OnShoeClick());
+		glassesBtn.setOnClickListener(new OnGlassesClick());
+		bikeBtn.setOnClickListener(new OnNotImpClick());
+		cameraBtn.setOnClickListener(new OnNotImpClick());
 
-		infoName.setText("Created for account: " + userName);
-		infoBirth.setText("Character birth on: " + birthday + "\t \t Character is: " + cont.getCharacterAge() + " old");
-		infoCal.setText("Today you have burnt: " + cont.getTodayCals() + "\t \t Total you have burnt: " + cont.getTotalCals());
-		infoStep.setText("Today you have walked: " + cont.getTodaySteps() + " steps \t \t Total you have walked: " + cont.getTotalSteps());
-		infoCom.setText("You have spent: " + cont.getTimeSpent() + " with Boogie");
+		String[] infoList = {"Created for account: " + userName, "Character birth on: " + birthday + "\nCharacter is: " + cont.getCharacterAge() + " old",
+										"Today you have burnt: " + cont.getTodayCals() + "\nTotal you have burnt: " + cont.getTotalCals(),
+								"Today you have walked: " + cont.getTodaySteps() + " steps \nTotal you have walked: " + cont.getTotalSteps() + " steps",
+								"You have communicated today for: " + cont.getCommTimeToday() + "\nTotal you have communicated for: " + cont.getCommTimeTotal(),
+								"You have spent: " + cont.getTimeSpent() + " with Boogie"};
 
-		BoggiFat idleFat = new BoggiFat(centerX,centerY);
-		boogieView.addView(initializeForView(idleFat,cfg));
-		if (graphics.getView() instanceof SurfaceView) {
-			SurfaceView glView = (SurfaceView) graphics.getView();
-			glView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-			glView.setZOrderOnTop(true);
-		}
+	//	infoListView.setAdapter(new ListViewAdapter(this,infoList));
+
+
+
+
+		initiateBoogieView();
 
 
 
@@ -358,6 +450,145 @@ public class AndroidLauncher extends AndroidApplication {
 			infoView.setVisibility(View.GONE);
 			starView.setVisibility(View.VISIBLE);
 			initiateSpineView();
+		}
+	}
+
+	private class OnShoeClick implements View.OnClickListener{
+		@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+		@Override
+		public void onClick(View view) {
+			cont.openItemDialog(0);
+		}
+	}
+
+	private class OnGlassesClick implements View.OnClickListener{
+		@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+		@Override
+		public void onClick(View view) {
+			cont.openItemDialog(1);
+		}
+	}
+
+	private class OnNotImpClick implements View.OnClickListener{
+		@Override
+		public void onClick(View view) {
+			Toast.makeText(getApplication(),"NOT YET TO BE IMPLEMENTED :(", Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private class OnPrevClick implements View.OnClickListener{
+		@Override
+		public void onClick(View view) {
+
+			if(infoToView == 0){
+				infoToView = 3;
+			}else
+				infoToView --;
+
+
+
+			switch(infoToView){
+
+
+				case 0:
+					headerView.setText("Boogie");
+					todayTextView.setText("Born: ");
+					todaySumView.setText(cont.getCharacterBirth());
+					totalTextView.setText("Age: ");
+					totalSumView.setText(cont.getCharacterAge() + " days");
+					avgView.setText("Time with Boogie: ");
+					avgSumView.setText(cont.getTimeSpent());
+
+					break;
+
+				case 1:
+					headerView.setText("Calorie Burnt");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getTodayCals() + " cals");
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getTotalCals() + " cals");
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgCal() + " cals");
+					break;
+
+				case 2:
+					headerView.setText("Walked");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getTodaySteps() + " steps");
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getTotalSteps() + " steps");
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgSteps() + " steps");
+					break;
+
+				case 3:
+					headerView.setText("Communication");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getCommTimeToday());
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getCommTimeTotal());
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgComm());
+					break;
+
+			}
+
+		}
+	}
+
+	private class OnNextClick implements View.OnClickListener{
+		@Override
+		public void onClick(View view) {
+
+			if(infoToView == 3){
+				infoToView = 0;
+			}else
+			infoToView ++;
+
+
+			switch(infoToView){
+				case 0:
+					headerView.setText("Boogie");
+					todayTextView.setText("Born: ");
+					todaySumView.setText(cont.getCharacterBirth());
+					totalTextView.setText("Age: ");
+					totalSumView.setText(cont.getCharacterAge() + " days");
+					avgView.setText("Time with Boogie: ");
+					avgSumView.setText(cont.getTimeSpent());
+					break;
+
+				case 1:
+					headerView.setText("Calorie Burnt");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getTodayCals() + " cals");
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getTotalCals() + " cals");
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgCal() + " cals");
+					break;
+
+				case 2:
+					headerView.setText("Walked");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getTodaySteps() + " steps");
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getTotalSteps() + " steps");
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgSteps() + " steps");
+					break;
+
+				case 3:
+					headerView.setText("Communication");
+					todayTextView.setText("Today: ");
+					todaySumView.setText(cont.getCommTimeToday());
+					totalTextView.setText("Total: ");
+					totalSumView.setText(cont.getCommTimeTotal());
+					avgView.setText("Average: ");
+					avgSumView.setText(cont.getAvgComm());
+					break;
+
+			}
+
 		}
 	}
 

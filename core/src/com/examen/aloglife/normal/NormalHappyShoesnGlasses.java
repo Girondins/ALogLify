@@ -24,10 +24,10 @@ import spine.SkeletonMeshRenderer;
 import spine.SkeletonRendererDebug;
 
 /**
- * Created by Girondins on 2017-03-28.
+ * Created by Girondins on 2017-03-30.
  */
 
-public class NormalSad extends ApplicationAdapter{
+public class NormalHappyShoesnGlasses extends ApplicationAdapter {
 
 
     OrthographicCamera camera;
@@ -44,7 +44,7 @@ public class NormalSad extends ApplicationAdapter{
 
     private float centerX,centerY;
 
-    public NormalSad(float centerX, float centerY){
+    public NormalHappyShoesnGlasses(float centerX, float centerY){
         this.centerX = centerX;
         this.centerY = centerY;
         System.out.println("Ceneter is " + centerX);
@@ -60,10 +60,10 @@ public class NormalSad extends ApplicationAdapter{
         debugRenderer.setRegionAttachments(false);
         debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("normal/normalSad/boggisaddy_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("normal/normalHappyShoesnGlasses/boggiNormalShoesnGlasses_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(1f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalSad/boggisaddy.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalHappyShoesnGlasses/boggiNormalShoesnGlasses.json"));
 
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
@@ -91,7 +91,7 @@ public class NormalSad extends ApplicationAdapter{
         loggiSkel  = new Skeleton(skeletonDataLog);
         loggiSkel.setPosition(150,350);
 
-        timer.schedule(new NormalSad.Animater(),2000);
+        timer.schedule(new NormalHappyShoesnGlasses.Animater(),2000);
 
         // Keys in higher tracks override the pose from lower tracks.
         Gdx.input.setInputProcessor(new InputAdapter() {
@@ -147,7 +147,7 @@ public class NormalSad extends ApplicationAdapter{
         renderer.draw(batch, skeleton); // Draw the skeleton images.
         batch.end();
 
-     //   debugRenderer.draw(skeleton); // Draw debug lines.
+        //   debugRenderer.draw(skeleton); // Draw debug lines.
     }
 
     public void resize (int width, int height) {
@@ -217,15 +217,22 @@ public class NormalSad extends ApplicationAdapter{
                         }
                         state.addAnimation(0, "Idle", true, 0);
                         break;
+                    case 2:
+                        state.setAnimation(0, "lookatshoes", false);
+                        state.addAnimation(0, "Idle", true, 0);
+                        break;
+                    case 3:
+                        state.setAnimation(0, "idle_glasses", false);
+                        state.addAnimation(0, "Idle", true, 0);
+
                 }
                 try {
                     Thread.sleep(sleepDuration);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                task = rand.nextInt(2);
+                task = rand.nextInt(4);
             }
         }
     }
-
 }

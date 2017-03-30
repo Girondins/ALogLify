@@ -148,7 +148,7 @@ public class NormalHappy extends ApplicationAdapter{
         renderer.draw(batch, skeleton); // Draw the skeleton images.
         batch.end();
 
-        debugRenderer.draw(skeleton); // Draw debug lines.
+     //   debugRenderer.draw(skeleton); // Draw debug lines.
     }
 
     public void resize (int width, int height) {

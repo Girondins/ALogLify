@@ -3,7 +3,9 @@ package com.examen.aloglife;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import org.joda.time.DateTime;
@@ -45,10 +47,16 @@ public class Controller {
     private String lastLoginBefore;
     private volatile boolean isFirst = false;
     private TakeTime tTime;
+    private boolean hasShoes,hasGlasses;
+    private int stepsTakenPerHourAvg,commPerHourAvg,calPerHourAvg;
+    private Item[] shoeList,glassesList;
+
+
+
 
 
     public static enum SPINEVIEW{
-        IDLE,FAT,FIT,NORMAL
+        NORMALHAPPY,NORMALSAD,NORMALHAPPYSHOES,NORMALHAPPYSHOESNGLASSES
     }
 
     private SPINEVIEW selectedView;
@@ -60,17 +68,20 @@ public class Controller {
         setYesterday();
         setTime();
         hoursMidnight();
+        setupItemDesc();
         db = new DatabaseConnect(activity);
     }
 
     public Controller(Activity activity, String userName,Double height,Double weight, Double bmr, String birthday){
         al = (AndroidLauncher) activity;
+        this.activity = activity;
         db = new DatabaseConnect(activity);
         this.userName = userName;
         this.height = height;
         this.weight = weight;
         this.bmr = bmr;
         this.birthday = birthday;
+        setupItemDesc();
         tTime = new TakeTime();
         tTime.start();
         setDate();
@@ -389,6 +400,36 @@ public class Controller {
         return toReturn;
     }
 
+    public String getCommTimeToday(){
+        String toReturn;
+        int minutes,seconds;
+        minutes = getTodayComm() / 60;
+        seconds = getTodayComm() - minutes * 60;
+
+        if(minutes == 0) {
+            toReturn = seconds + " seconds";
+
+        }else
+            toReturn = minutes + " minutes " + seconds + " seconds";
+
+        return toReturn;
+    }
+
+    public String getCommTimeTotal(){
+        String toReturn;
+        int minutes,seconds;
+        minutes = getTotalComm() / 60;
+        seconds = getTotalComm() - minutes * 60;
+
+        if(minutes == 0) {
+            toReturn = seconds + " seconds";
+
+        }else
+            toReturn = minutes + " minutes " + seconds + " seconds";
+
+        return toReturn;
+    }
+
     public void setCalToBeBurnt(){
         Calendar c = Calendar.getInstance();
         Calendar m = Calendar.getInstance(); //midnight
@@ -481,28 +522,75 @@ public class Controller {
     //TODO Determine which Spine animation to load on start and update
     // Determined by total calories burnt factor
     public void setParametersToLoad(){
-    //    int stepFactor = 50000;
-    //    int commFactor = 500;
-    //    boolean oneWeek = userCharacter.getAge() % 7 == 0;
         int checkSize,checkMood,checkShoes,checkComm;
 
         checkSize = determineSize();
         checkMood = determineMood();
+        checkShoes = determineSteps();
+        checkComm = determineComm();
+
+        checkInventory(checkShoes,checkComm);
 
         switch (checkSize){
             //Normal
             case 0:
                 switch(checkMood){
+                    //Happy
                     case 0:
-                        //Happy
-                        Log.d("Test Mood", checkMood + "");
-                        break;
+                        if(hasShoes && !hasGlasses){
+                            switch(checkShoes){
+                                //Adidas
+                                case 1:
+                                    selectedView = SPINEVIEW.NORMALHAPPYSHOES;
+                                    break;
+                                //Train
+                                case 2:
+                                    //TA BORT SEN FEL SKOR
+                                    selectedView = SPINEVIEW.NORMALHAPPYSHOES;
+                                    break;
+                            }
 
+                        }
+
+                        else if(hasGlasses && !hasShoes){
+
+                        }
+
+                        else if(hasGlasses && hasShoes){
+                            switch(checkShoes){
+                                //Adidas && Glasses
+                                case 1:
+                                    //TODO HÖR MED ALEX OM WAVE
+                                    selectedView = SPINEVIEW.NORMALHAPPYSHOESNGLASSES;
+                                    break;
+                                //Train && Glasses
+                                case 2:
+                                    break;
+                            }
+
+                        }
+                        else {
+                            selectedView = SPINEVIEW.NORMALHAPPY;
+                        }
+                        break;
+                    //Sad
                     case 1:
-                        //Sad
+                        if(hasShoes && !hasGlasses){
+
+                        }
+
+                        else if(hasGlasses && !hasShoes){
+
+                        }
+
+                        else if(hasGlasses && hasShoes){
+
+                        }
+                        else {
+                            selectedView = SPINEVIEW.NORMALSAD;
+                        }
                         break;
                 }
-                selectedView = SPINEVIEW.NORMAL;
                 break;
             //Fat
             case 1:
@@ -515,7 +603,7 @@ public class Controller {
                         //Sad
                         break;
                 }
-                selectedView = SPINEVIEW.NORMAL;
+                selectedView = SPINEVIEW.NORMALHAPPY;
                 break;
             //XXL
             case 2:
@@ -528,7 +616,7 @@ public class Controller {
                         //Sad
                         break;
                 }
-                selectedView = SPINEVIEW.NORMAL;
+                selectedView = SPINEVIEW.NORMALHAPPY;
                 break;
         }
         Log.d(" PARA NULL" , totalCals + "  OR : " + toHaveBeenBurnt);
@@ -538,6 +626,15 @@ public class Controller {
     public int determineSize(){
         int calorieFactor = (int) (bmr*3);
         int calDiff = (int) (totalCals - toHaveBeenBurnt);
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+
+        calPerHourAvg = (int) (totalCals / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
+
 
         if(calDiff <= calorieFactor || -calorieFactor <= calDiff){
             fontColor = Color.YELLOW;
@@ -576,6 +673,125 @@ public class Controller {
         }
 
     }
+
+    public int determineSteps(){
+        double low = 312.5,medium = 416.6;
+
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+        int lowStepsCount = (int) (((userCharacter.getAge()) * 7500) + (hoursSinceMidnight * low) - (fromMidnight * low));
+        int mediumStepsCount = (int) (((userCharacter.getAge()) * 10000) + (hoursSinceMidnight * medium) - (fromMidnight * medium));
+
+
+        stepsTakenPerHourAvg = (int) (totalSteps / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
+
+
+        Log.d("TOTAL STEPPIS", totalSteps + " " + hoursSinceMidnight + " SINCE " + fromMidnight);
+        Log.d("Steps per hour avg: " , stepsTakenPerHourAvg + " STEPS");
+        Log.d("Steps per Hour low: ", lowStepsCount + " LOW");
+        Log.d("Steps per Hour med: ", mediumStepsCount + " med");
+
+        if(stepsTakenPerHourAvg>= mediumStepsCount){
+            return 2;
+        }
+
+        if(stepsTakenPerHourAvg>=lowStepsCount){
+            return 1;
+        }
+
+
+        return 0;
+
+
+    }
+
+    public int determineComm(){
+        int avg = 190;
+
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+        int avgSpentTime = (int) (((userCharacter.getAge()) * 4560) + (hoursSinceMidnight * avg) - (fromMidnight * avg));
+
+
+        commPerHourAvg = (int) (totalComm / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
+
+
+        if(avgSpentTime<= commPerHourAvg){
+            return 1;
+        }
+
+        return 0;
+    }
+
+    public void checkInventory(int shoeCheck, int glassesCheck){
+
+        if(shoeCheck > 0){
+            hasShoes = true;
+        }
+
+        if(glassesCheck > 0){
+            hasGlasses = true;
+        }
+
+    }
+
+    public int getAvgSteps(){
+        return this.stepsTakenPerHourAvg;
+    }
+
+    public String getAvgComm(){
+        String toReturn;
+        int minutes,seconds;
+        minutes = this.commPerHourAvg / 60;
+        seconds = this.commPerHourAvg - minutes * 60;
+
+        if(minutes == 0) {
+            toReturn = seconds + " seconds";
+
+        }else
+            toReturn = minutes + " minutes " + seconds + " seconds";
+
+        return toReturn;
+    }
+
+    public int getAvgCal(){
+        return this.calPerHourAvg;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    public void openItemDialog(int toOpen){
+        ItemDialog itemDialog = new ItemDialog();
+
+
+        switch(toOpen){
+            case 0:
+                itemDialog.setup("Shoes",shoeList);
+                break;
+            case 1:
+                itemDialog.setup("Glasses",glassesList);
+                break;
+
+        }
+
+        itemDialog.show(activity.getFragmentManager(), "Items");
+    }
+
+    //TODO SET PICS WHEN HAVE
+    public void setupItemDesc(){
+        shoeList = new Item[]{new Item("Sneakers","Have an average of 7500 steps per day",null,activity), new Item("Trainers","Have an average of 10000 steps per day",null,activity)};
+        glassesList = new Item[]{new Item("Readers","Have communication on a average of 4560 seconds a day", null , activity)};
+    }
+
+
+
 
     public void stopTimer(){
         tTime.stopTimer();

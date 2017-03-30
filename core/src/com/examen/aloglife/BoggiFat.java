@@ -117,8 +117,6 @@ public class BoggiFat extends ApplicationAdapter {
             }
 
             public boolean keyDown (int keycode) {
-                state.setAnimation(0, "jumpNormal", false); // Set animation on track 0 to jump.
-                state.addAnimation(0, "idlenormal", true, 0); // Queue run to play after jump.
                 return true;
             }
         });
