@@ -29,7 +29,7 @@ public class DatabaseConnect extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "aloglife.db";
-    private static final int DATABASE_VERSION = 30;
+    private static final int DATABASE_VERSION = 31;
     private static final String DATABASE_CREATE_CHAR = "CREATE TABLE " + TABLE_CHAR + "(" +
             COLUMN_ID + " text not null primary key, " +
             COLUMN_BIRTH + " text , " +

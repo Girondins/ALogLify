@@ -1,0 +1,76 @@
+
+boggieFatSad_shoes_tex.png
+size: 0,0
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+tear
+  rotate: false
+  xy: 830 ,1
+  size: 150 ,150
+  orig: 150 ,150
+  offset: 0,0
+  index: -1
+left_leg
+  rotate: false
+  xy: 1 ,326
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1
+LeftGreen
+  rotate: false
+  xy: 605 ,605
+  size: 200 ,150
+  orig: 200 ,150
+  offset: 0,0
+  index: -1
+right_leg
+  rotate: false
+  xy: 303 ,628
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1
+RightGreen
+  rotate: false
+  xy: 628 ,1
+  size: 200 ,150
+  orig: 200 ,150
+  offset: 0,0
+  index: -1
+white
+  rotate: false
+  xy: 326 ,1
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1
+lefty
+  rotate: false
+  xy: 605 ,303
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1
+eyes
+  rotate: false
+  xy: 1 ,628
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1
+fatSad_1
+  rotate: false
+  xy: 1 ,1
+  size: 323 ,323
+  orig: 323 ,323
+  offset: 0,0
+  index: -1
+right
+  rotate: false
+  xy: 303 ,326
+  size: 300 ,300
+  orig: 300 ,300
+  offset: 0,0
+  index: -1

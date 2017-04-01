@@ -48,10 +48,11 @@ public class Controller {
     private volatile boolean isFirst = false;
     private TakeTime tTime;
     private boolean hasShoes,hasGlasses,hasPhone;
-    private int stepsTakenPerHourAvg,commPerHourAvg,calPerHourAvg;
+    private int stepsTakenPerHourAvg,commPerHourAvg,calPerHourAvg,browPerHourAvg;
     private int isSize;
     private boolean isHappy;
-    private Item[] shoeList,glassesList;
+    private Item[] shoeList,glassesList,handList;
+    private int backgroundToLoad;
 
 
 
@@ -61,8 +62,8 @@ public class Controller {
         NORMALHAPPY,NORMALHAPPYSHOES,NORMALHAPPYSHOESTRAIN,NORMALHAPPYGLASSES,NORMALHAPPYPHONE,NORMALHAPPYSHOESNGLASSES,NORMALHAPPYSHOESNPHONE,NORMALHAPPYSHOENPHONETRAIN,NORMALHAPPYSHOENGLASSESTRAIN,NORMALHAPPYPHONENGLASSES,NORMALHAPPYGSP,NORMALHAPPYGSPTRAIN,
         NORMALSAD,NORMALSADSHOES,NORMALSADSHOESTRAIN,NORMALSADGLASSES,NORMALSADPHONE,NORMALSADSHOESNGLASSES,NORMALSADSHOESNPHONE,NORMALSADSHOENPHONETRAIN,NORMALSADSHOENGLASSESTRAIN,NORMALSADPHONENGLASSES,NORMALSADGSP,NORMALSADGSPTRAIN,
 
-        FATHAPPY,FATHAPPYSHOES,FATHAPPYSHOESTRAIN,FATHAPPYGLASSES,FATHAPPYPHONE,FATHAPPYSHOESNGLASSES,FATHAPPYSHOESNPHONE,FATHAPPYSHOENPHONETRAIN,FATHAPPYSHOENGLASSESTRAIN,FATHAPPYPHONENGLASSES,FATHAPPYGSP,FATHAPPYGSPTRAIN,
-        FATSAD,FATSADSHOES,FATSADSHOESTRAIN,FATSADGLASSES,FATSADPHONE,FATSADSHOESNGLASSES,FATSADSHOESNPHONE,FATSADSHOENPHONETRAIN,FATSADSHOENGLASSESTRAIN,FATSADPHONENGLASSES,FATSADGSP,FATSADGSPTRAIN,
+        FATHAPPY,FATHAPPYSHOES,FATHAPPYGLASSES,FATHAPPYPHONE,FATHAPPYSHOESNGLASSES,FATHAPPYSHOESNPHONE,FATHAPPYPHONENGLASSES,FATHAPPYGSP,
+        FATSAD,FATSADSHOES,FATSADGLASSES,FATSADPHONE,FATSADSHOESNGLASSES,FATSADSHOESNPHONE,FATSADPHONENGLASSES,FATSADGSP,
 
         XXLHAPPY,XXLHAPPYSHOES,XXLHAPPYSHOESTRAIN,XXLHAPPYGLASSES,XXLHAPPYPHONE,XXLHAPPYSHOESNGLASSES,XXLHAPPYSHOESNPHONE,XXLHAPPYSHOENPHONETRAIN,XXLHAPPYSHOENGLASSESTRAIN,XXLHAPPYPHONENGLASSES,XXLHAPPYGSP,XXLHAPPYGSPTRAIN,
         XXLSAD,XXLSADSHOES,XXLSADSHOESTRAIN,XXLSADGLASSES,XXLSADPHONE,XXLSADSHOESNGLASSES,XXLSADSHOESNPHONE,XXLSADSHOENPHONETRAIN,XXLSADSHOENGLASSESTRAIN,XXLSADPHONENGLASSES,XXLSADGSP,XXLSADGSPTRAIN,
@@ -77,7 +78,6 @@ public class Controller {
         setYesterday();
         setTime();
         hoursMidnight();
-        setupItemDesc();
         db = new DatabaseConnect(activity);
     }
 
@@ -90,7 +90,6 @@ public class Controller {
         this.weight = weight;
         this.bmr = bmr;
         this.birthday = birthday;
-        setupItemDesc();
         tTime = new TakeTime();
         tTime.start();
         setDate();
@@ -228,6 +227,7 @@ public class Controller {
                 al.setSpineView(selectedView);
                 al.updateInfo();
                 al.refreshComplete();
+              //  al.initiateSpineView();
             }
         });
     }
@@ -489,6 +489,21 @@ public class Controller {
         return toReturn;
     }
 
+    public String getBrowTimeAvg(){
+        String toReturn;
+        int minutes,seconds;
+        minutes =  browPerHourAvg / 60;
+        seconds = browPerHourAvg - minutes * 60;
+
+        if(minutes == 0) {
+            toReturn = seconds + " seconds";
+
+        }else
+            toReturn = minutes + " minutes " + seconds + " seconds";
+
+        return toReturn;
+    }
+
     public void setCalToBeBurnt(){
         Calendar c = Calendar.getInstance();
         Calendar m = Calendar.getInstance(); //midnight
@@ -578,6 +593,10 @@ public class Controller {
         return this.lastLoginBefore;
     }
 
+    public int getBackgroundToLoad(){
+        return backgroundToLoad;
+    }
+
     //TODO Determine which Spine animation to load on start and update
     // Determined by total calories burnt factor
     public void setParametersToLoad(){
@@ -588,8 +607,11 @@ public class Controller {
         checkShoes = determineSteps();
         checkComm = determineComm();
         checkBrow = determineBrow();
+        backgroundToLoad = determineTimeOfDay();
 
         checkInventory(checkShoes,checkBrow,checkComm);
+
+        setupItemDesc();
 
         switch (checkSize){
             //Normal
@@ -763,10 +785,6 @@ public class Controller {
                                 case 1:
                                     selectedView = SPINEVIEW.FATHAPPYSHOES;
                                     break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOESTRAIN;
-                                    break;
                             }
 
                         }
@@ -791,10 +809,6 @@ public class Controller {
                                 case 1:
                                     selectedView = SPINEVIEW.FATHAPPYSHOESNGLASSES;
                                     break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOENGLASSESTRAIN;
-                                    break;
                             }
                         }
 
@@ -804,10 +818,6 @@ public class Controller {
                                 //Adidas
                                 case 1:
                                     selectedView = SPINEVIEW.FATHAPPYSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOENPHONETRAIN;
                                     break;
                             }
 
@@ -819,10 +829,6 @@ public class Controller {
                                 //Adidas
                                 case 1:
                                     selectedView = SPINEVIEW.FATHAPPYGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATHAPPYGSPTRAIN;
                                     break;
                             }
                         }
@@ -838,10 +844,6 @@ public class Controller {
                                 //Adidas
                                 case 1:
                                     selectedView = SPINEVIEW.FATSADSHOES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATSADSHOESTRAIN;
                                     break;
                             }
 
@@ -867,10 +869,6 @@ public class Controller {
                                 case 1:
                                     selectedView = SPINEVIEW.FATSADSHOESNGLASSES;
                                     break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATSADSHOENGLASSESTRAIN;
-                                    break;
                             }
                         }
 
@@ -880,10 +878,6 @@ public class Controller {
                                 //Adidas
                                 case 1:
                                     selectedView = SPINEVIEW.FATSADSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATSADSHOENPHONETRAIN;
                                     break;
                             }
 
@@ -895,10 +889,6 @@ public class Controller {
                                 //Adidas
                                 case 1:
                                     selectedView = SPINEVIEW.FATSADGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.FATSADGSPTRAIN;
                                     break;
                             }
                         }
@@ -1070,6 +1060,30 @@ public class Controller {
 
     }
 
+    public int determineTimeOfDay(){
+        if(hoursSinceMidnight>=6 && hoursSinceMidnight<=10){
+            return  0;
+
+        }
+
+        if(hoursSinceMidnight>=10 && hoursSinceMidnight<=19){
+            return  1;
+        }
+
+        if(hoursSinceMidnight>=19 && hoursSinceMidnight <= 21){
+            return  2;
+        }
+
+        if(hoursSinceMidnight >= 21 && hoursSinceMidnight <= 23.99){
+            return 3;
+        }
+
+        if(hoursSinceMidnight >= 0 && hoursSinceMidnight <= 6){
+            return 3;
+        }
+            return 2;
+    }
+
     public int determineSize(){
         int calorieFactor = (int) (bmr*3);
         int calDiff = (int) (totalCals - toHaveBeenBurnt);
@@ -1091,11 +1105,17 @@ public class Controller {
 
         if(calDiff > calorieFactor){
             fontColor = Color.GREEN;
+            isSize = 0;
+            return 0;
+        }
+
+        if(calDiff < -calorieFactor){
+            fontColor = Color.rgb(255,165,0);
             isSize = 1;
             return 1;
         }
 
-        if(calDiff < -calorieFactor){
+        if(calDiff < -calorieFactor-(bmr*1.5)){
             fontColor = Color.RED;
             isSize = 2;
             return 2;
@@ -1135,8 +1155,8 @@ public class Controller {
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
-        int lowStepsCount = (int) (((userCharacter.getAge()) * 7500) + (hoursSinceMidnight * low) - (fromMidnight * low));
-        int mediumStepsCount = (int) (((userCharacter.getAge()) * 10000) + (hoursSinceMidnight * medium) - (fromMidnight * medium));
+   //     int lowStepsCount = (int) (((userCharacter.getAge()) * 7500) + (hoursSinceMidnight * low) - (fromMidnight * low));
+   //     int mediumStepsCount = (int) (((userCharacter.getAge()) * 10000) + (hoursSinceMidnight * medium) - (fromMidnight * medium));
 
 
         stepsTakenPerHourAvg = (int) (totalSteps / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
@@ -1144,14 +1164,14 @@ public class Controller {
 
         Log.d("TOTAL STEPPIS", totalSteps + " " + hoursSinceMidnight + " SINCE " + fromMidnight);
         Log.d("Steps per hour avg: " , stepsTakenPerHourAvg + " STEPS");
-        Log.d("Steps per Hour low: ", lowStepsCount + " LOW");
-        Log.d("Steps per Hour med: ", mediumStepsCount + " med");
+    //    Log.d("Steps per Hour low: ", lowStepsCount + " LOW");
+    //    Log.d("Steps per Hour med: ", mediumStepsCount + " med");
 
-        if(stepsTakenPerHourAvg>= mediumStepsCount){
+        if(stepsTakenPerHourAvg>= medium){
             return 2;
         }
 
-        if(stepsTakenPerHourAvg>=lowStepsCount){
+        if(stepsTakenPerHourAvg>=low){
             return 1;
         }
 
@@ -1170,13 +1190,13 @@ public class Controller {
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
-        int avgSpentTime = (int) (((userCharacter.getAge()) * 4560) + (hoursSinceMidnight * avg) - (fromMidnight * avg));
+    //    int avgSpentTime = (int) (((userCharacter.getAge()) * 4560) + (hoursSinceMidnight * avg) - (fromMidnight * avg));
 
 
         commPerHourAvg = (int) (totalComm / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
 
 
-        if(avgSpentTime<= commPerHourAvg){
+        if(avg <= commPerHourAvg){
             return 1;
         }
 
@@ -1184,7 +1204,24 @@ public class Controller {
     }
 
     public int determineBrow(){
+        int avg = 25;
+
+        Calendar m = Calendar.getInstance(); //midnight
+        m.set(Calendar.HOUR_OF_DAY, 0);
+        m.set(Calendar.MINUTE, 0);
+        m.set(Calendar.SECOND, 0);
+        m.set(Calendar.MILLISECOND, 0);
+        double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
+     //   int avgSpentTime = (int) (((userCharacter.getAge()) * 600) + (hoursSinceMidnight * avg) - (fromMidnight * avg));
+
+        browPerHourAvg = (int) (totalBrows / (((userCharacter.getAge()) * 24) + hoursSinceMidnight - fromMidnight));
+
+        if(avg<= browPerHourAvg){
+            return 1;
+        }
+
         return 0;
+
     }
 
     public void checkInventory(int shoeCheck, int glassesCheck, int phoneCheck){
@@ -1246,16 +1283,48 @@ public class Controller {
             case 1:
                 itemDialog.setup("Glasses",glassesList);
                 break;
+            case 2:
+                itemDialog.setup("Hands",handList);
+                break;
 
         }
 
         itemDialog.show(activity.getFragmentManager(), "Items");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
+    public void openInfoDialog(){
+        InfoDialog info = new InfoDialog();
+        info.show(activity.getFragmentManager(), "Info");
+
+    }
+
     //TODO SET PICS WHEN HAVE
     public void setupItemDesc(){
-        shoeList = new Item[]{new Item("Sneakers","Have an average of 7500 steps per day",null,activity), new Item("Trainers","Have an average of 10000 steps per day",null,activity)};
-        glassesList = new Item[]{new Item("Readers","Have communication on a average of 4560 seconds a day", null , activity)};
+
+        if(hasShoes){
+            if(2 == determineSteps()){
+                shoeList = new Item[]{new Item("Sneakers:", "Have an average of ","7500" ," steps per day","shoes2",activity,false),
+                        new Item("Trainers:","Have an average of "," 10000 ", " steps per day","juanshoe",activity,false)};
+            }else {
+                shoeList = new Item[]{new Item("Sneakers",  "Have an average of ","7500", " steps per day", "shoes2", activity, false),
+                        new Item("Trainers:",  "Have an average of "," ***** ", " steps per day", "juanshoe", activity, true)};
+            }
+        }else
+            shoeList = new Item[]{new Item("Sneakers", "Have an average of ","****" ," steps per day","shoes2",activity,true),
+                    new Item("Trainers:","Have an average of "," **** ", " steps per day","juanshoe",activity,true)};
+
+        if(hasGlasses){
+            glassesList = new Item[]{new Item("Readers:","Have browsing on a average of ","600"," seconds a day", "glasses", activity,false)};
+        }else
+            glassesList = new Item[]{new Item("Readers:","Have browsing on a average of ","****"," seconds a day", "glasses" , activity,true)};
+
+
+        if(hasPhone){
+            handList = new Item[]{new Item("Xperia:",  "Have communication on a average of ","4560"," seconds a day", "xperia", activity,false)};
+        }else
+            handList = new Item[]{new Item("Xperia:", "Have communication on a average of ", "****"," seconds a day", "xperia", activity,true)};
+
     }
 
 

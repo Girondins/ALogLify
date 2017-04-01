@@ -63,7 +63,7 @@ public class NormalHappy extends ApplicationAdapter{
 
         atlas = new TextureAtlas(Gdx.files.internal("normal/normalHappy/boggi_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-        json.setScale(1.4f); // Load the skeleton at 50% the size it was in Spine.
+        json.setScale(1.2f); // Load the skeleton at 50% the size it was in Spine.
         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("normal/normalHappy/boggi.json"));
 
 
@@ -97,7 +97,7 @@ public class NormalHappy extends ApplicationAdapter{
         SkeletonData skeletonDataLog = jsonAtl.readSkeletonData(Gdx.files.internal("loggi/LoggiBoy.json"));
 
         loggiSkel  = new Skeleton(skeletonDataLog);
-        loggiSkel.setPosition(150,350);
+        loggiSkel.setPosition(220,130);
 
         timer.schedule(new NormalHappy.Animater(),2000);
 

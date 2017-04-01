@@ -1,7 +1,10 @@
 package com.examen.aloglife;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,7 @@ public class ListViewAdapter extends ArrayAdapter <Item>{
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -42,7 +46,12 @@ public class ListViewAdapter extends ArrayAdapter <Item>{
 
         itemImg.setImageResource(itemList[position].getItemPic());
         itemName.setText(itemList[position].getName());
-        itemDesc.setText(itemList[position].getDescription());
+        itemDesc.setText(itemList[position].getDescription() + itemList[position].getCount() + itemList[position].getEnding());
+
+        if(itemList[position].getIsBlurred()){
+            itemImg.setAlpha((float) 0.2);
+            Log.d("Blurring", itemList[position].getName());
+        }
 
 
         return convertView;

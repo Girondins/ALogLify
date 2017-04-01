@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    >
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="603dp"
+        android:layout_height="match_parent"
         android:weightSum="1"
         android:id="@+id/infoViewID"
         android:visibility="gone"
+        android:background="@drawable/change"
         >
 
         <TextView
@@ -18,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:textSize="30dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:id="@+id/overviewID" />
 
 
         <LinearLayout
@@ -28,12 +32,12 @@
             android:layout_weight="0.3">
 
             <Button
-                android:text="Button"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:id="@+id/prevBtnID"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:background="@drawable/arrowleft" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -136,13 +140,13 @@
             </LinearLayout>
 
             <Button
-                android:text="Button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/nextBtnID"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:background="@drawable/arrowright"
+                android:layout_height="30dp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -167,17 +171,48 @@
             android:layout_height="match_parent"
             android:layout_weight="0.4">
 
-            <TextView
-                android:text="Acheivements:"
-                android:textSize="20dp"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:gravity="center"
-                android:layout_height="30dp" />
+                android:layout_height="match_parent"
+                android:layout_weight="0.9"
+                android:gravity="center">
+
+                <TextView
+                    android:text="Inventory"
+                    android:textSize="20dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="right"
+                    android:layout_height="30dp"
+                    android:layout_weight="0.3"
+                    android:id="@+id/inventoryID" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView3"
+                    android:layout_weight="0.01" />
+
+                <ImageButton
+                    android:layout_width="5dp"
+                    android:layout_height="15dp"
+                    android:id="@+id/infoBtnID"
+                    android:layout_weight="0.02"
+                    android:background="@drawable/icon"
+                    android:layout_gravity="top"
+                    android:elevation="1dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.30" />
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_weight="0.7">
 
                 <Button
                     android:text="SHOES"
@@ -194,7 +229,7 @@
                     android:layout_weight="1" />
 
                 <Button
-                    android:text="BIKE"
+                    android:text="HANDS"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/bikeBtnID"
@@ -212,10 +247,11 @@
 
 
         <Button
-            android:text="RETURN"
-            android:layout_width="match_parent"
+            android:text="Back"
             android:layout_height="wrap_content"
-            android:id="@+id/returnBtnID" />
+            android:id="@+id/returnBtnID"
+            android:layout_gravity="center"
+            android:layout_width="200dp" />
 
     </LinearLayout>
 
@@ -226,19 +262,52 @@
         android:id="@+id/startViewID"
         android:weightSum="1">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.45">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ageTextID"
+                android:layout_weight="0.7" />
+
+            <Button
+                android:id="@+id/overviewBtnID"
+                android:background="@drawable/thinking"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="12dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+            <Button
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="12dp"
+                android:id="@+id/lifelogBtnID"
+                android:background="@drawable/lifeloglogo"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+        </LinearLayout>
+
+
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipeContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.2">
+            android:layout_weight="0.10">
 
-        <RelativeLayout
+            <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="247dp"
-            android:id="@+id/spineViewID"
-            android:background="@drawable/walkpark">
+            android:id="@+id/spineViewID">
 
-        </RelativeLayout>
+            </RelativeLayout>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -246,7 +315,9 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.8">
+            android:layout_weight="0.45"
+            android:alpha="0.5"
+            android:background="@color/BurlyWood">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -260,7 +331,9 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/calBTN"
                     android:layout_weight="0.33"
-                    android:textSize="10sp"/>
+                    android:textSize="10sp"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent"/>
 
                 <Button
                     android:text="Button"
@@ -268,7 +341,9 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/stepsBTN"
                     android:layout_weight="0.33"
-                    android:textSize="10sp"/>
+                    android:textSize="10sp"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent" />
 
                 <Button
                     android:text="Button"
@@ -276,29 +351,20 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/ageBTN"
                     android:layout_weight="0.33"
-                    android:textSize="10sp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2">
+                    android:textSize="10sp"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent" />
 
                 <Button
                     android:text="Button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/commBtnID"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.33"
+                    android:textSize="10sp"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent" />
 
-                <Button
-                    android:text="Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/interactBtnID"
-                    android:layout_weight="1" />
             </LinearLayout>
 
             <TextView

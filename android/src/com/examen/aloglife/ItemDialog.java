@@ -5,11 +5,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -32,9 +36,18 @@ public class ItemDialog extends DialogFragment {
         itemsView = (ListView) v.findViewById(R.id.itemListViewID);
         itemsView.setAdapter(new ListViewAdapter(getActivity(),items));
 
+        TextView tit = new TextView(getActivity());
+        tit.setText(title);
+        tit.setBackgroundColor(Color.WHITE);
+        tit.setPadding(10, 10, 10, 10);
+        tit.setGravity(Gravity.CENTER);
+        tit.setTextColor(Color.BLACK);
+        tit.setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/gloss.ttf"));
+        tit.setTextSize(20);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(v);
-        builder.setTitle(title);
+        builder.setCustomTitle(tit);
         builder.setCancelable(false);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

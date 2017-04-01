@@ -5,11 +5,11 @@
     android:layout_height="80dp">
 
     <ImageView
-        android:layout_width="80dp"
         app:srcCompat="@android:drawable/btn_star_big_on"
         android:id="@+id/itemViewID"
         android:layout_weight="1"
-        android:layout_height="80dp" />
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -23,7 +23,6 @@
             android:layout_height="match_parent"
             android:id="@+id/itemNameID"
             android:layout_weight="0.4"
-            android:textSize="20dp"
             android:gravity="center_vertical"
            />
 
@@ -32,10 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/itemDescID"
-            android:textSize="15dp"
             android:gravity="center_vertical"
             android:layout_weight="0.6"
-            />
+            android:textSize="10dp" />
     </LinearLayout>
 
 </LinearLayout>
