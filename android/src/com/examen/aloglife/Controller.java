@@ -688,6 +688,7 @@ public class Controller {
                     //Happy
                     case 0:
                         Log.d("CHAR AAAGE:" , getCharacterAge() + "");
+                        if(getCharacterAge() != 0) {
                             //HAR SKOR
                             if (hasShoes && !hasGlasses && !hasPhone) {
                                 switch (checkShoes) {
@@ -760,9 +761,12 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.NORMALHAPPY;
                             }
+                        }else
+                            selectedView = SPINEVIEW.NORMALHAPPY;
                         break;
                     //Sad
                     case 1:
+                        if(getCharacterAge() != 0) {
                             //HAR SKOR
                             if (hasShoes && !hasGlasses && !hasPhone) {
                                 switch (checkShoes) {
@@ -835,6 +839,8 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.NORMALSAD;
                             }
+                        }else
+                            selectedView = SPINEVIEW.NORMALSAD;
                         break;
                 }
                 break;
@@ -845,6 +851,7 @@ public class Controller {
                 switch(checkMood){
                     //Happy
                     case 0:
+                        if(getCharacterAge() != 0) {
                             //HAR SKOR
                             if (hasShoes && !hasGlasses && !hasPhone) {
                                 switch (checkShoes) {
@@ -901,9 +908,12 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.FATHAPPY;
                             }
+                        }else
+                            selectedView = SPINEVIEW.FATHAPPY;
                         break;
                     //Sad
                     case 1:
+                        if(getCharacterAge() != 0) {
                             //HAR SKOR
                             if (hasShoes && !hasGlasses && !hasPhone) {
                                 switch (checkShoes) {
@@ -960,6 +970,8 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.FATSAD;
                             }
+                        }else
+                            selectedView = SPINEVIEW.FATSAD;
                         break;
                 }
                 break;
@@ -968,6 +980,7 @@ public class Controller {
                 switch(checkMood){
                     //Happy
                     case 0:
+                        if(getCharacterAge() != 0) {
                             //HAR GLASÖGON
                             if (hasGlasses && !hasShoes && !hasPhone) {
                                 selectedView = SPINEVIEW.XXLHAPPYGLASSES;
@@ -983,10 +996,13 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.XXLHAPPY;
                             }
+                        }else
+                            selectedView = SPINEVIEW.XXLHAPPY;
                         break;
                     //Sad
                     case 1:
 
+                        if(getCharacterAge() != 0) {
                             //HAR GLASÖGON
                             if (hasGlasses && !hasShoes && !hasPhone) {
                                 selectedView = SPINEVIEW.XXLSADGLASSES;
@@ -1002,6 +1018,8 @@ public class Controller {
                             } else {
                                 selectedView = SPINEVIEW.XXLSAD;
                             }
+                        }else
+                            selectedView = SPINEVIEW.XXLSAD;
                         break;
                 }
                 break;
