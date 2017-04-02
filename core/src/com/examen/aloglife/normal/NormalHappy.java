@@ -171,7 +171,7 @@ public class NormalHappy extends ApplicationAdapter{
         private int task = 0;
         private int flipChance;
         private boolean isFlip = false;
-        private int sleepDuration = rand.nextInt(10000)+3000;
+        private int sleepDuration = rand.nextInt(10000)+000;
 
 
         //TODO FIXA ANIMATION SPEED

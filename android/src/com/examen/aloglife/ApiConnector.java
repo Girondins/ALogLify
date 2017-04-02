@@ -363,12 +363,15 @@ public class ApiConnector {
                         Log.d("Details ", details.toString());
                         JSONArray steps = (JSONArray) details.get("steps");
                         JSONArray aee = (JSONArray) details.get("aee");
-                        for(int j = 0 ; j<steps.size(); j++){
-                            stepsCount += (Long) steps.get(j);
+                        if(steps != null) {
+                            for (int j = 0; j < steps.size(); j++) {
+                                stepsCount += (Long) steps.get(j);
+                            }
                         }
-                        for(int y = 0; y<aee.size(); y++){
-                            aeeCount += (Double) aee.get(y);
-                            Log.d("Per add Count: ", " "  + aeeCount);
+                        if(aee != null) {
+                            for (int y = 0; y < aee.size(); y++) {
+                                aeeCount += (Double) aee.get(y);
+                            }
                         }
                         break;
 

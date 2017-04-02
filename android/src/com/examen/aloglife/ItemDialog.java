@@ -42,7 +42,7 @@ public class ItemDialog extends DialogFragment {
         tit.setPadding(10, 10, 10, 10);
         tit.setGravity(Gravity.CENTER);
         tit.setTextColor(Color.BLACK);
-        tit.setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/gloss.ttf"));
+        tit.setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/soft.otf"));
         tit.setTextSize(20);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -62,5 +62,12 @@ public class ItemDialog extends DialogFragment {
     public void setup(String title,Item[] items){
         this.title = title;
         this.items = items;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/soft.otf"));
     }
 }

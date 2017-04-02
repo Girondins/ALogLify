@@ -1,6 +1,7 @@
 package com.examen.aloglife;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -35,7 +36,7 @@ public class ListViewAdapter extends ArrayAdapter <Item>{
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView itemName,itemDesc;
         ImageView itemImg;
-
+        Typeface tp = Typeface.createFromAsset(getContext().getAssets(), "fonts/soft.otf");
         if(convertView==null){
             convertView = inflater.inflate(R.layout.listviewadapter,parent,false);
         }
@@ -43,6 +44,9 @@ public class ListViewAdapter extends ArrayAdapter <Item>{
         itemName = (TextView) convertView.findViewById(R.id.itemNameID);
         itemDesc = (TextView) convertView.findViewById(R.id.itemDescID);
         itemImg = (ImageView) convertView.findViewById(R.id.itemViewID);
+
+        itemName.setTypeface(tp);
+        itemDesc.setTypeface(tp);
 
         itemImg.setImageResource(itemList[position].getItemPic());
         itemName.setText(itemList[position].getName());

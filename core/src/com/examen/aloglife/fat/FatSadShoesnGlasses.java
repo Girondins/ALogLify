@@ -86,8 +86,6 @@ public class FatSadShoesnGlasses extends ApplicationAdapter {
         stateData.setMix("walk", "idle", 0.2f);
         stateData.setMix("idle", "idle_glasses", 0.2f);
         stateData.setMix("idle_glasses", "idle", 0.2f);
-        stateData.setMix("idle", "Lookatshoes", 0.2f);
-        stateData.setMix("Lookatshoes", "idle", 0.2f);
 
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "idle", true);
@@ -232,10 +230,6 @@ public class FatSadShoesnGlasses extends ApplicationAdapter {
                         state.setAnimation(0, "idle_glasses", false);
                         state.addAnimation(0, "idle", true, 0);
                         break;
-                    case 3:
-                        state.setAnimation(0, "Lookatshoes", false);
-                        state.addAnimation(0, "idle", true, 0);
-                        break;
 
                 }
                 try {
@@ -243,7 +237,7 @@ public class FatSadShoesnGlasses extends ApplicationAdapter {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                task = rand.nextInt(4);
+                task = rand.nextInt(3);
             }
         }
     }

@@ -65,8 +65,8 @@ public class Controller {
         FATHAPPY,FATHAPPYSHOES,FATHAPPYGLASSES,FATHAPPYPHONE,FATHAPPYSHOESNGLASSES,FATHAPPYSHOESNPHONE,FATHAPPYPHONENGLASSES,FATHAPPYGSP,
         FATSAD,FATSADSHOES,FATSADGLASSES,FATSADPHONE,FATSADSHOESNGLASSES,FATSADSHOESNPHONE,FATSADPHONENGLASSES,FATSADGSP,
 
-        XXLHAPPY,XXLHAPPYSHOES,XXLHAPPYSHOESTRAIN,XXLHAPPYGLASSES,XXLHAPPYPHONE,XXLHAPPYSHOESNGLASSES,XXLHAPPYSHOESNPHONE,XXLHAPPYSHOENPHONETRAIN,XXLHAPPYSHOENGLASSESTRAIN,XXLHAPPYPHONENGLASSES,XXLHAPPYGSP,XXLHAPPYGSPTRAIN,
-        XXLSAD,XXLSADSHOES,XXLSADSHOESTRAIN,XXLSADGLASSES,XXLSADPHONE,XXLSADSHOESNGLASSES,XXLSADSHOESNPHONE,XXLSADSHOENPHONETRAIN,XXLSADSHOENGLASSESTRAIN,XXLSADPHONENGLASSES,XXLSADGSP,XXLSADGSPTRAIN,
+        XXLHAPPY,XXLHAPPYGLASSES,XXLHAPPYPHONE,XXLHAPPYPHONENGLASSES,
+        XXLSAD,XXLSADGLASSES,XXLSADPHONE,XXLSADPHONENGLASSES,
     }
 
     private SPINEVIEW selectedView;
@@ -120,6 +120,7 @@ public class Controller {
         info.putSerializable("view",selectedView);
         Log.d("Renew", calories + "");
         i.putExtras(info);
+        Log.d("LAST BEFORE CRASH", " YOLO");
         activity.startActivity(i);
         activity.finish();
     }
@@ -415,91 +416,158 @@ public class Controller {
 
     public String getTimeSpent(){
         String toReturn;
-        int totalTime,minutes,seconds;
+        int totalTime;
         totalTime = userCharacter.getTimeSpent() + timer;
-        minutes = totalTime / 60;
-        seconds = totalTime - minutes * 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        int hours = (int) totalTime / 3600;
+        int remainder = (int) totalTime - hours * 3600;
+        int mins = remainder / 60;
+
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-        toReturn = minutes + " minutes " + seconds + " seconds";
+        toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }
 
     public String getCommTimeToday(){
         String toReturn;
-        int minutes,seconds;
-        minutes = getTodayComm() / 60;
-        seconds = getTodayComm() - minutes * 60;
+        int hours = (int) getTodayComm() / 3600;
+        int remainder = (int) getTodayComm() - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }
 
     public String getCommTimeTotal(){
         String toReturn;
-        int minutes,seconds;
-        minutes = getTotalComm() / 60;
-        seconds = getTotalComm() - minutes * 60;
+        int hours = (int) getTotalComm() / 3600;
+        int remainder = (int) getTotalComm() - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }
 
     public String getBrowTimeToday(){
         String toReturn;
-        int minutes,seconds;
-        minutes =  getTodayBrow() / 60;
-        seconds = getTodayBrow() - minutes * 60;
+        int hours = (int) getTodayBrow() / 3600;
+        int remainder = (int) getTodayBrow() - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }
 
     public String getBrowTimeTotal(){
         String toReturn;
-        int minutes,seconds;
-        minutes =  getTotalBrows() / 60;
-        seconds = getTotalBrows() - minutes * 60;
+        int hours = (int) getTotalBrows() / 3600;
+        int remainder = (int) getTotalBrows() - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }
 
     public String getBrowTimeAvg(){
         String toReturn;
-        int minutes,seconds;
-        minutes =  browPerHourAvg / 60;
-        seconds = browPerHourAvg - minutes * 60;
+        int hours = (int) (browPerHourAvg*24) / 3600;
+        int remainder = (int) (browPerHourAvg*24) - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
+
+
+        return toReturn;
+    }
+
+    public String getBrowFirstToday(){
+        String toReturn;
+
+        int hours = (int) getTodayBrow() / 3600;
+        int remainder = (int) getTodayBrow() - hours * 3600;
+        int mins = remainder / 60;
+
+        String textHour = (hours < 10 ? "0" : "") + hours;
+        String textMintue = (mins < 10 ? "0" : "") + mins;
+
+
+        toReturn = textHour + ":" + textMintue + " h";
+
+        return toReturn;
+    }
+
+    public String getBrowFirstTotal(){
+        String toReturn;
+
+        int hours = (int) getTotalBrows() / 3600;
+        int remainder = (int) getTotalBrows() - hours * 3600;
+        int mins = remainder / 60;
+
+        String textHour = (hours < 10 ? "0" : "") + hours;
+        String textMintue = (mins < 10 ? "0" : "") + mins;
+
+
+        toReturn = textHour + ":" + textMintue + " h";
+
+        return toReturn;
+    }
+
+    public String getCommFirstToday(){
+        String toReturn;
+
+        int hours = (int) getTodayComm() / 3600;
+        int remainder = (int) getTodayComm() - hours * 3600;
+        int mins = remainder / 60;
+
+        String textHour = (hours < 10 ? "0" : "") + hours;
+        String textMintue = (mins < 10 ? "0" : "") + mins;
+
+
+        toReturn = textHour + ":" + textMintue + " h";
+
+        return toReturn;
+    }
+
+    public String getCommFirstTotal(){
+        String toReturn;
+
+        int hours = (int) getTotalComm() / 3600;
+        int remainder = (int) getTotalComm() - hours * 3600;
+        int mins = remainder / 60;
+
+        String textHour = (hours < 10 ? "0" : "") + hours;
+        String textMintue = (mins < 10 ? "0" : "") + mins;
+
+
+        toReturn = textHour + ":" + textMintue + " h";
 
         return toReturn;
     }
@@ -619,155 +687,154 @@ public class Controller {
                 switch(checkMood){
                     //Happy
                     case 0:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOESTRAIN;
-                                    break;
-                            }
+                        Log.d("CHAR AAAGE:" , getCharacterAge() + "");
+                            //HAR SKOR
+                            if (hasShoes && !hasGlasses && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOES;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOESTRAIN;
+                                        break;
+                                }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
+                            }
+                            //HAR GLASÖGON
+                            else if (hasGlasses && !hasShoes && !hasPhone) {
                                 selectedView = SPINEVIEW.NORMALHAPPYGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
                                 selectedView = SPINEVIEW.NORMALHAPPYPHONE;
-                        }
+                            }
 
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
                                 selectedView = SPINEVIEW.NORMALHAPPYPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOESNGLASSES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOENGLASSESTRAIN;
-                                    break;
-                            }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALHAPPYSHOENPHONETRAIN;
-                                    break;
                             }
 
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALHAPPYGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALHAPPYGSPTRAIN;
-                                    break;
+                            //HAR GLASÖGON OCH SKOR
+                            else if (hasGlasses && hasShoes && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOESNGLASSES;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOENGLASSESTRAIN;
+                                        break;
+                                }
                             }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.NORMALHAPPY;
-                        }
+
+                            //HAR SKOR OCH TELEFON
+                            else if (!hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOESNPHONE;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALHAPPYSHOENPHONETRAIN;
+                                        break;
+                                }
+
+                            }
+
+                            //HAR ALLT
+                            else if (hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALHAPPYGSP;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALHAPPYGSPTRAIN;
+                                        break;
+                                }
+                            } else {
+                                selectedView = SPINEVIEW.NORMALHAPPY;
+                            }
                         break;
                     //Sad
                     case 1:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALSADSHOES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALSADSHOESTRAIN;
-                                    break;
-                            }
+                            //HAR SKOR
+                            if (hasShoes && !hasGlasses && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALSADSHOES;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALSADSHOESTRAIN;
+                                        break;
+                                }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
+                            }
+                            //HAR GLASÖGON
+                            else if (hasGlasses && !hasShoes && !hasPhone) {
                                 selectedView = SPINEVIEW.NORMALSADGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
                                 selectedView = SPINEVIEW.NORMALSADPHONE;
-                        }
-
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.NORMALSADPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALSADSHOESNGLASSES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALSADSHOENGLASSESTRAIN;
-                                    break;
-                            }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALSADSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALSADSHOENPHONETRAIN;
-                                    break;
                             }
 
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.NORMALSADGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.NORMALSADGSPTRAIN;
-                                    break;
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.NORMALSADPHONENGLASSES;
                             }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.NORMALSAD;
-                        }
+
+                            //HAR GLASÖGON OCH SKOR
+                            else if (hasGlasses && hasShoes && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALSADSHOESNGLASSES;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALSADSHOENGLASSESTRAIN;
+                                        break;
+                                }
+                            }
+
+                            //HAR SKOR OCH TELEFON
+                            else if (!hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALSADSHOESNPHONE;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALSADSHOENPHONETRAIN;
+                                        break;
+                                }
+
+                            }
+
+                            //HAR ALLT
+                            else if (hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.NORMALSADGSP;
+                                        break;
+                                    //Train
+                                    case 2:
+                                        selectedView = SPINEVIEW.NORMALSADGSPTRAIN;
+                                        break;
+                                }
+                            } else {
+                                selectedView = SPINEVIEW.NORMALSAD;
+                            }
                         break;
                 }
                 break;
@@ -778,123 +845,121 @@ public class Controller {
                 switch(checkMood){
                     //Happy
                     case 0:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOES;
-                                    break;
+                            //HAR SKOR
+                            if (hasShoes && !hasGlasses && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATHAPPYSHOES;
+                                        break;
+                                }
+
+                            }
+                            //HAR GLASÖGON
+                            else if (hasGlasses && !hasShoes && !hasPhone) {
+                                selectedView = SPINEVIEW.FATHAPPYGLASSES;
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.FATHAPPYPHONE;
                             }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
-                            selectedView = SPINEVIEW.FATHAPPYGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.FATHAPPYPHONE;
-                        }
-
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.FATHAPPYPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOESNGLASSES;
-                                    break;
-                            }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATHAPPYSHOESNPHONE;
-                                    break;
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.FATHAPPYPHONENGLASSES;
                             }
 
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATHAPPYGSP;
-                                    break;
+                            //HAR GLASÖGON OCH SKOR
+                            else if (hasGlasses && hasShoes && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATHAPPYSHOESNGLASSES;
+                                        break;
+                                }
                             }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.FATHAPPY;
-                        }
+
+                            //HAR SKOR OCH TELEFON
+                            else if (!hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATHAPPYSHOESNPHONE;
+                                        break;
+                                }
+
+                            }
+
+                            //HAR ALLT
+                            else if (hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATHAPPYGSP;
+                                        break;
+                                }
+                            } else {
+                                selectedView = SPINEVIEW.FATHAPPY;
+                            }
                         break;
                     //Sad
                     case 1:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATSADSHOES;
-                                    break;
+                            //HAR SKOR
+                            if (hasShoes && !hasGlasses && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATSADSHOES;
+                                        break;
+                                }
+
+                            }
+                            //HAR GLASÖGON
+                            else if (hasGlasses && !hasShoes && !hasPhone) {
+                                selectedView = SPINEVIEW.FATSADGLASSES;
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.FATSADPHONE;
                             }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
-                            selectedView = SPINEVIEW.FATSADGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.FATSADPHONE;
-                        }
-
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.FATSADPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATSADSHOESNGLASSES;
-                                    break;
-                            }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATSADSHOESNPHONE;
-                                    break;
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.FATSADPHONENGLASSES;
                             }
 
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.FATSADGSP;
-                                    break;
+                            //HAR GLASÖGON OCH SKOR
+                            else if (hasGlasses && hasShoes && !hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATSADSHOESNGLASSES;
+                                        break;
+                                }
                             }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.FATSAD;
-                        }
+
+                            //HAR SKOR OCH TELEFON
+                            else if (!hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATSADSHOESNPHONE;
+                                        break;
+                                }
+
+                            }
+
+                            //HAR ALLT
+                            else if (hasGlasses && hasShoes && hasPhone) {
+                                switch (checkShoes) {
+                                    //Adidas
+                                    case 1:
+                                        selectedView = SPINEVIEW.FATSADGSP;
+                                        break;
+                                }
+                            } else {
+                                selectedView = SPINEVIEW.FATSAD;
+                            }
                         break;
                 }
                 break;
@@ -903,155 +968,40 @@ public class Controller {
                 switch(checkMood){
                     //Happy
                     case 0:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOESTRAIN;
-                                    break;
+                            //HAR GLASÖGON
+                            if (hasGlasses && !hasShoes && !hasPhone) {
+                                selectedView = SPINEVIEW.XXLHAPPYGLASSES;
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.XXLHAPPYPHONE;
                             }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
-                            selectedView = SPINEVIEW.XXLHAPPYGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.XXLHAPPYPHONE;
-                        }
-
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.XXLHAPPYPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOESNGLASSES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOENGLASSESTRAIN;
-                                    break;
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.XXLHAPPYPHONENGLASSES;
+                            } else {
+                                selectedView = SPINEVIEW.XXLHAPPY;
                             }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLHAPPYSHOENPHONETRAIN;
-                                    break;
-                            }
-
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLHAPPYGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLHAPPYGSPTRAIN;
-                                    break;
-                            }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.XXLHAPPY;
-                        }
                         break;
                     //Sad
                     case 1:
-                        //HAR SKOR
-                        if(hasShoes && !hasGlasses && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLSADSHOES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLSADSHOESTRAIN;
-                                    break;
+
+                            //HAR GLASÖGON
+                            if (hasGlasses && !hasShoes && !hasPhone) {
+                                selectedView = SPINEVIEW.XXLSADGLASSES;
+                            }
+                            //HAR TELEFON
+                            else if (!hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.XXLSADPHONE;
                             }
 
-                        }
-                        //HAR GLASÖGON
-                        else if(hasGlasses && !hasShoes && !hasPhone){
-                            selectedView = SPINEVIEW.XXLSADGLASSES;
-                        }
-                        //HAR TELEFON
-                        else if(!hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.XXLSADPHONE;
-                        }
-
-                        //HAR TELEFON OCH GLASÖGON
-                        else if(hasGlasses && !hasShoes && hasPhone){
-                            selectedView = SPINEVIEW.XXLSADPHONENGLASSES;
-                        }
-
-                        //HAR GLASÖGON OCH SKOR
-                        else if(hasGlasses && hasShoes && !hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLSADSHOESNGLASSES;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLSADSHOENGLASSESTRAIN;
-                                    break;
+                            //HAR TELEFON OCH GLASÖGON
+                            else if (hasGlasses && !hasShoes && hasPhone) {
+                                selectedView = SPINEVIEW.XXLSADPHONENGLASSES;
+                            } else {
+                                selectedView = SPINEVIEW.XXLSAD;
                             }
-                        }
-
-                        //HAR SKOR OCH TELEFON
-                        else if(!hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLSADSHOESNPHONE;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLSADSHOENPHONETRAIN;
-                                    break;
-                            }
-
-                        }
-
-                        //HAR ALLT
-                        else if(hasGlasses && hasShoes && hasPhone){
-                            switch(checkShoes){
-                                //Adidas
-                                case 1:
-                                    selectedView = SPINEVIEW.XXLSADGSP;
-                                    break;
-                                //Train
-                                case 2:
-                                    selectedView = SPINEVIEW.XXLSADGSPTRAIN;
-                                    break;
-                            }
-                        }
-                        else {
-                            selectedView = SPINEVIEW.XXLSAD;
-                        }
                         break;
                 }
                 break;
@@ -1098,25 +1048,25 @@ public class Controller {
 
 
         if(calDiff <= calorieFactor || -calorieFactor <= calDiff){
-            fontColor = Color.YELLOW;
+            fontColor = Color.rgb(236,234,62);
             isSize = 0;
             return 0;
         }
 
         if(calDiff > calorieFactor){
-            fontColor = Color.GREEN;
+            fontColor = Color.rgb(141, 199, 63);
             isSize = 0;
             return 0;
         }
 
         if(calDiff < -calorieFactor){
-            fontColor = Color.rgb(255,165,0);
+            fontColor = Color.rgb(242,106,63);
             isSize = 1;
             return 1;
         }
 
         if(calDiff < -calorieFactor-(bmr*1.5)){
-            fontColor = Color.RED;
+            fontColor = Color.rgb(255,51,51);
             isSize = 2;
             return 2;
         }
@@ -1131,7 +1081,7 @@ public class Controller {
         m.set(Calendar.SECOND, 0);
         m.set(Calendar.MILLISECOND, 0);
         double fromMidnight = ((double)userCharacter.getBirthFromMidnight() / (double)(1000*60*60));
-        int timeShouldSpent = (int) (((userCharacter.getAge()) * 480) + (hoursSinceMidnight * 20) - (fromMidnight * 20));
+        int timeShouldSpent = (int) (((userCharacter.getAge()) * 380) + (hoursSinceMidnight * 16) - (fromMidnight * 20));
 
 
         Log.d("Time Shoud Spent: " + timeShouldSpent, " Time have Spent: " + userCharacter.getTimeSpent() +" Time: " + timer);
@@ -1254,15 +1204,15 @@ public class Controller {
 
     public String getAvgComm(){
         String toReturn;
-        int minutes,seconds;
-        minutes = this.commPerHourAvg / 60;
-        seconds = this.commPerHourAvg - minutes * 60;
+        int hours = (int) (this.commPerHourAvg*24) / 3600;
+        int remainder = (int) (this.commPerHourAvg*24) - hours * 3600;
+        int mins = remainder / 60;
 
-        if(minutes == 0) {
-            toReturn = seconds + " seconds";
+        if(hours == 0) {
+            toReturn = mins + " minutes";
 
         }else
-            toReturn = minutes + " minutes " + seconds + " seconds";
+            toReturn = hours + " hours " + mins + " minutes";
 
         return toReturn;
     }

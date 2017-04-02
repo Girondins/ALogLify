@@ -60,10 +60,10 @@ public class XXLHappyGlasses extends ApplicationAdapter {
         debugRenderer.setRegionAttachments(false);
         debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("fat/fatHappyGlasses/Fatglasses_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("xxl/xxlHappyGlasses/xxl_glasses_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(1.2f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("fat/fatHappyGlasses/Fatglasses.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("xxl/xxlHappyGlasses/xxl_glasses.json"));
 
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).

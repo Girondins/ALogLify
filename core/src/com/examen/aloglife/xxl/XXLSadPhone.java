@@ -60,10 +60,10 @@ public class XXLSadPhone extends ApplicationAdapter{
         debugRenderer.setRegionAttachments(false);
         debugRenderer.setMeshHull(false);
 
-        atlas = new TextureAtlas(Gdx.files.internal("fat/fatSadPhone/boggieFatSad_phone_tex.atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("xxl/xxlSadPhone/xxl_sad_phone_tex.atlas"));
         SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
         json.setScale(1.2f); // Load the skeleton at 50% the size it was in Spine.
-        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("fat/fatSadPhone/boggieFatSad_phone.json"));
+        SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("xxl/xxlSadPhone/xxl_sad_phone.json"));
 
 
         skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
@@ -84,8 +84,8 @@ public class XXLSadPhone extends ApplicationAdapter{
         stateData.setMix("sitting", "idle", 0.2f);
         stateData.setMix("idle", "walk", 0.2f);
         stateData.setMix("walk", "idle", 0.2f);
-        stateData.setMix("idle", "Lookiatphone", 0.2f);
-        stateData.setMix("Lookiatphone", "idle", 0.2f);
+        stateData.setMix("idle", "Lookatphone", 0.2f);
+        stateData.setMix("Lookatphone", "idle", 0.2f);
 
         // Queue animations on tracks 0 and 1.
         state.setAnimation(0, "idle", true);
@@ -227,7 +227,7 @@ public class XXLSadPhone extends ApplicationAdapter{
                         state.addAnimation(0, "idle", true, 0);
                         break;
                     case 2:
-                        state.setAnimation(0, "Lookiatphone", false);
+                        state.setAnimation(0, "Lookatphone", false);
                         state.addAnimation(0, "idle", true, 0);
                         break;
                 }
